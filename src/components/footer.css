@@ -1,0 +1,145 @@
+.footer {
+    background-color: #0056d2;
+    color: white;
+    width: 100%;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 40px 10%;
+}
+
+.footer-section.about {
+    flex: 0 0 30%;
+}
+
+.footer-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+}
+
+.footer-description {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    max-width: 400px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background-color: white;
+    border-radius: 50%;
+    color: #0056d2;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.footer-section.sitemap,
+.footer-section.faq {
+    flex: 0 0 15%;
+}
+
+.section-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 2px;
+    background-color: white;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 13px;
+}
+
+.footer-links a:hover {
+    padding-left: 5px;
+    opacity: 0.9;
+}
+
+.footer-section.contact {
+    flex: 0 0 20%;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.contact-icon {
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.footer-bottom {
+    text-align: left;
+    padding: 20px 10%;
+    font-size: 13px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media screen and (max-width: 992px) {
+    .footer-content {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .footer-section.about,
+    .footer-section.sitemap,
+    .footer-section.faq,
+    .footer-section.contact {
+        flex: 0 0 100%;
+    }
+}
