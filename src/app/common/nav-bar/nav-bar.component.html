@@ -1,0 +1,91 @@
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="logo">
+            Even<span class="logo-accent">ticks</span>
+        </div>
+
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <ul class="nav-links" id="navLinks">
+            <li class="dropdown-container">
+                <a href="#" class="dropdown-toggle">
+                    Events
+                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#">Concerts</a>
+                    </li>
+                    <li>
+                        <a href="#">Festivals</a>
+                    </li>
+                    <li>
+                        <a href="#">Workshops</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown-container">
+                <a href="#" class="dropdown-toggle">
+                    Theater
+                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#">Drama</a>
+                    </li>
+                    <li>
+                        <a href="#">Musicals</a>
+                    </li>
+                    <li>
+                        <a href="#">Comedy</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown-container">
+                <a href="#" class="dropdown-toggle">
+                    Sports
+                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#">Football</a>
+                    </li>
+                    <li>
+                        <a href="#">Basketball</a>
+                    </li>
+                    <li>
+                        <a href="#">Tennis</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Leisure</a>
+            </li>
+            <li>
+                <a href="#">Other</a>
+            </li>
+        </ul>
+
+        <div class="auth-buttons desktop">
+            <button class="register-btn" (click)="openRegisterPopup()">Register</button>
+            <button class="sign-in-btn" (click)="openLoginPopup()">Sign In</button>
+        </div>
+    </div>
+</nav>
+

@@ -1,0 +1,144 @@
+.footer {
+  background-color: #0056d2;
+  color: white;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  padding: 0;
+
+  .footer-content {
+    display: flex;
+    flex-direction: row;
+    padding: 40px 10%;
+    justify-content: center;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .section {
+      &:first-child {
+        flex: 0 0 33%;
+        padding-right: 60px;
+        
+        @media (max-width: 768px) {
+          flex: 0 0 100%;
+          padding-right: 0;
+        }
+        
+        h2 {
+          font-size: 24px;
+          font-weight: bold;
+          margin: 0 0 15px 0;
+        }
+        
+        p {
+          font-size: 14px;
+          line-height: 1.5;
+          margin-bottom: 20px;
+        }
+      }
+      
+      &:not(:first-child) {
+        flex: 0 0 20%;
+        
+        @media (max-width: 768px) {
+          flex: 0 0 100%;
+        }
+      }
+    }
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+    position: relative;
+    padding-bottom: 10px;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 40px;
+      height: 2px;
+      background-color: white;
+    }
+  }
+  
+  .link-list, .contact-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .contact-list {
+    li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      i {
+        font-size: 16px;
+        width: 16px;
+      }
+      
+      span {
+        font-size: 14px;
+      }
+    }
+  }
+  
+  .social-icons {
+    display: flex;
+    gap: 10px;
+    
+    .social-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background-color: white;
+      border-radius: 50%;
+      color: #0056d2;
+      font-size: 16px;
+      transition: transform 0.2s;
+      text-decoration: none;  
+      
+      &:hover {
+        transform: translateY(-3px);
+        text-decoration: none; 
+      }
+    }
+  }
+  
+  .footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 15px 10%;
+    display: flex;
+    justify-content: center;
+    
+    p {
+      font-size: 12px;
+      margin: 0;
+    }
+  }
+}

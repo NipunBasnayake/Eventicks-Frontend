@@ -1,0 +1,58 @@
+<footer class="footer">
+    <div class="footer-content">
+      <div class="section">
+        <h2>Eventicks</h2>
+        <p>
+          Eventicks is one of the fast-growing ticket marketplaces that includes events of music, sport, art, theatre, and more. It is capable of accommodating events of all types, sizes, and complexities with state-of-the-art technology.
+        </p>
+        <div class="social-icons">
+            <a href="#" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" class="social-icon"><i class="fa-brands fa-linkedin"></i></a>            
+          <a href="mailto:hello@eventicks.com" class="social-icon"><i class="fa fa-envelope"></i></a>
+        </div>
+      </div>
+  
+      <div class="section">
+        <h3 class="section-title">Site Map</h3>
+        <ul class="link-list">
+          <li><a [routerLink]="['/events']">Events</a></li>
+          <li><a [routerLink]="['/events']" [queryParams]="{category: 'theater'}">Theater</a></li>
+          <li><a [routerLink]="['/events']" [queryParams]="{category: 'sports'}">Sports</a></li>
+          <li><a [routerLink]="['/events']" [queryParams]="{category: 'leisure'}">Leisure</a></li>
+          <li><a [routerLink]="['/events']" [queryParams]="{category: 'other'}">Other</a></li>
+        </ul>
+      </div>
+  
+      <div class="section">
+        <h3 class="section-title">FAQ</h3>
+        <ul class="link-list">
+          <li><a [routerLink]="['/privacy-policy']">Privacy Policy</a></li>
+          <li><a [routerLink]="['/terms-conditions']">Terms & Conditions</a></li>
+        </ul>
+      </div>
+  
+      <div class="section">
+        <h3 class="section-title">Contact</h3>
+        <ul class="contact-list">
+          <li>
+            <i class="fa fa-phone"></i>
+            <span>071 000 0000 | 077 000 0000</span>
+          </li>
+          <li>
+            <i class="fa fa-map-marker"></i>
+            <span>No 261/A/3/5, Galle Road, Panadura</span>
+          </li>
+          <li>
+            <i class="fa fa-envelope"></i>
+            <span>hello&#64;eventicks.com</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>© Copyright {{ currentYear }} Eventicks Private Limited | All Rights Reserved</p>
+    </div>
+  </footer>
