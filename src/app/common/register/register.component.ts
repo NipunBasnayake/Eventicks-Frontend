@@ -14,7 +14,7 @@ export class RegisterComponent implements OnInit {
   @Output() login = new EventEmitter<void>();
   
   registerForm!: FormGroup;
-  isVisible = true;
+  isVisible = false;
   submitted = false;
   passwordStrength = 0;
   strengthText = 'Create a strong password';
@@ -34,7 +34,6 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Convenience getter for easy access to form fields
   get f() { 
     return this.registerForm.controls; 
   }
@@ -42,44 +41,43 @@ export class RegisterComponent implements OnInit {
   onSubmit(): void {
     this.submitted = true;
 
-    // Stop if form is invalid
     if (this.registerForm.invalid) {
       return;
     }
 
-    // Process form data here
     console.log('Form submitted:', this.registerForm.value);
     
-    // You would typically call a service method here to handle the registration
-    // this.authService.register(this.registerForm.value).subscribe(...)
-    
-    // For demo purposes, show success and close
     alert('Registration successful!');
     this.closeModal();
+  }
+
+  openModal(): void {
+    this.isVisible = true;
   }
 
   closeModal(): void {
     this.isVisible = false;
     setTimeout(() => {
       this.close.emit();
-    }, 300); // Match the CSS transition duration
+    }, 300);
+  }
+
+  closeOverlayOnOutsideClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).className.includes('popup-overlay')) {
+      this.closeModal();
+    }
   }
 
   goToLogin(event: Event): void {
     event.preventDefault();
-    this.closeModal();
-    setTimeout(() => {
-      this.login.emit();
-    }, 300);
+    this.isVisible = false;
+    this.login.emit();
   }
 
   signInWithGoogle(): void {
-    // Implement Google Sign In logic here
     console.log('Sign in with Google clicked');
-    // this.authService.signInWithGoogle().then(...)
   }
 
-  // Custom validator to check if password and confirm password match
   mustMatch(controlName: string, matchingControlName: string) {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const control = formGroup.get(controlName);
@@ -90,11 +88,9 @@ export class RegisterComponent implements OnInit {
       }
 
       if (matchingControl.errors && !matchingControl.errors['mustMatch']) {
-        // Return if another validator has already found an error
         return null;
       }
 
-      // Set error if controls don't match
       if (control.value !== matchingControl.value) {
         matchingControl.setErrors({ mustMatch: true });
         return { mustMatch: true };
@@ -105,7 +101,6 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  // Password strength checker
   checkPasswordStrength(): void {
     const password = this.f['password'].value;
     let strength = 0;
@@ -117,13 +112,9 @@ export class RegisterComponent implements OnInit {
       return;
     }
     
-    // Length check
     if (password.length >= 8) strength++;
-    // Uppercase check
     if (/[A-Z]/.test(password)) strength++;
-    // Numbers check
     if (/[0-9]/.test(password)) strength++;
-    // Special characters check
     if (/[^A-Za-z0-9]/.test(password)) strength++;
     
     this.passwordStrength = strength;
