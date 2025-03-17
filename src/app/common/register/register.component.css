@@ -2,7 +2,6 @@
   font-family: poppins, sans-serif;
 }
 
-
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -21,6 +20,24 @@
   &.show {
     opacity: 1;
     visibility: visible;
+  }
+}
+
+.register-trigger-button {
+  background-color: #4285F4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #3367d6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(66, 133, 244, 0.2);
   }
 }
 
@@ -253,7 +270,6 @@
   }
 }
 
-/* Password strength indicator */
 .password-strength {
   display: flex;
   margin-top: 8px;
@@ -278,19 +294,56 @@
   margin-top: 5px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .popup-container {
-    width: 90%;
+    width: 95%;
     max-width: none;
-    margin: 0 15px;
+    margin: 0 10px;
+    border-radius: 8px;
   }
   
+  .popup-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .popup-body {
+    padding: 20px 15px;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
   .form-actions {
     flex-direction: column;
   }
   
   .register-btn, .cancel-btn {
     width: 100%;
+  }
+  
+  .terms-checkbox {
+    flex-wrap: wrap;
+  }
+  
+  .terms-checkbox label {
+    font-size: 0.85rem;
+  }
+  
+  .google-button span {
+    font-size: 0.9rem;
+  }
+  
+  .login-link {
+    font-size: 0.85rem;
   }
 }

@@ -83,9 +83,23 @@
         </ul>
 
         <div class="auth-buttons desktop">
-            <button class="register-btn" (click)="openRegisterPopup()">Register</button>
-            <button class="sign-in-btn" (click)="openLoginPopup()">Sign In</button>
+            <button class="register-btn" (click)="openRegister()">Register</button>
+            <button class="sign-in-btn" (click)="openLogin()">Sign In</button>
         </div>
     </div>
 </nav>
 
+<div class="content-container">
+
+</div>
+
+<app-register *ngIf="showRegister" (close)="closeRegister()" (login)="handleGoToLogin()">
+</app-register>
+
+<app-login *ngIf="showLogin" (close)="closeLogin()" (register)="handleGoToRegister()"
+    (forgotPassword)="handleGoToForgotPassword($event)">
+</app-login>
+
+<app-forgot-password *ngIf="showForgotPassword" [email]="userEmail" (close)="closeForgotPassword()"
+    (login)="handleBackToLogin()">
+</app-forgot-password>
