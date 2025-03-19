@@ -39,16 +39,19 @@ export class LoginComponent implements OnInit {
   
   onSubmit(): void {
     this.submitted = true;
+    
     if (this.loginForm.invalid) {
       return;
     }
     
-    const { email, password } = this.loginForm.value;
+    const { email, password, rememberMe } = this.loginForm.value;
+    
     this.authService.login(email, password).subscribe({
       next: (response) => {
-        console.log(response.data.token);
-        localStorage.setItem('token', response.data.token);
+        this.authService.storeUserData(response.data || response, rememberMe);
+        
         alert('Login successful!');
+        
         this.closeModal();
       },
       error: (err) => {
@@ -57,9 +60,17 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-
+  
   openModal(): void {
     this.isVisible = true;
+    if (this.loginForm) {
+      this.loginForm.reset({
+        email: '',
+        password: '',
+        rememberMe: false
+      });
+      this.submitted = false;
+    }
   }
   
   closeModal(): void {
@@ -77,43 +88,43 @@ export class LoginComponent implements OnInit {
   
   goToRegister(event: Event): void {
     event.preventDefault();
-    this.isVisible = false; // Hide the modal visually first
-    // Emit the register event - don't close the component yet
-    // Let the parent handle the transition
+    this.isVisible = false;
     this.register.emit();
   }
   
   goToForgotPassword(event: Event): void {
     event.preventDefault();
     this.isVisible = false;
-    // Pass the email value if it exists
     const email = this.f['email'].value || '';
     this.forgotPassword.emit(email);
   }
   
+  // Google Sign-in method commented out as requested
   signInWithGoogle(): void {
-    // this.isGoogleLoading = true;
-    // this.authService.signInWithGoogle()
-    //   .then(user => {
-    //     console.log('Google user:', user);
-    //     // Process the Google login with your backend
-    //     this.authService.processGoogleLogin(user).subscribe(
-    //       response => {
-    //         console.log('Login successful:', response);
-    //         this.isGoogleLoading = false;
-    //         this.closeModal();
-    //       },
-    //       error => {
-    //         console.error('Login error:', error);
-    //         this.isGoogleLoading = false;
-    //         // Handle error (show message, etc.)
-    //       }
-    //     );
-    //   })
-    //   .catch(error => {
-    //     console.error('Google sign-in error:', error);
-    //     this.isGoogleLoading = false;
-    //     // Handle error (show message, etc.)
-    //   });
+    /*
+    this.isGoogleLoading = true;
+    this.authService.signInWithGoogle()
+      .then(googleUser => {
+        this.authService.processGoogleLogin(googleUser).subscribe({
+          next: (response) => {
+            // Store Google login in localStorage by default (or you can customize)
+            this.authService.storeUserData(response.data || response, true);
+            alert('Google login successful!');
+            this.closeModal();
+          },
+          error: (err) => {
+            console.error('Google login error:', err);
+            alert('Google login failed. Please try again.');
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Google sign-in error:', error);
+        alert('Google login failed. Please try again.');
+      })
+      .finally(() => {
+        this.isGoogleLoading = false;
+      });
+    */
   }
 }
