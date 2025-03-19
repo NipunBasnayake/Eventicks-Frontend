@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -12,30 +13,26 @@ import { CommonModule } from '@angular/common';
 export class RegisterComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() login = new EventEmitter<void>();
-  
+
   registerForm!: FormGroup;
   isVisible = false;
   submitted = false;
   passwordStrength = 0;
   strengthText = 'Create a strong password';
   strengthColor = '#5f6368';
+  isGoogleLoading = false;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-    this.registerForm = this.fb.group({
-      fullName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required],
-      termsAgree: [false, Validators.requiredTrue]
-    }, {
-      validators: this.mustMatch('password', 'confirmPassword')
-    });
+    this.initializeForm();
   }
 
-  get f() { 
-    return this.registerForm.controls; 
+  get f() {
+    return this.registerForm.controls;
   }
 
   onSubmit(): void {
@@ -45,10 +42,18 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    console.log('Form submitted:', this.registerForm.value);
-    
-    alert('Registration successful!');
-    this.closeModal();
+    const { fullName, email, password } = this.registerForm.value;
+
+    this.authService.register(fullName, email, password).subscribe({
+      next: (response) => {
+        alert('Registration successful!');
+        this.closeModal();
+      },
+      error: (err) => {
+        console.error('Registration error:', err);
+        alert('Registration failed. Please try again.');
+      }
+    });
   }
 
   openModal(): void {
@@ -75,10 +80,68 @@ export class RegisterComponent implements OnInit {
   }
 
   signInWithGoogle(): void {
-    console.log('Sign in with Google clicked');
+    // this.isGoogleLoading = true;
+
+    // this.authService.signInWithGoogle()
+    //   .then(user => {
+    //     this.authService.processGoogleLogin(user).subscribe({
+    //       next: (response) => {
+    //         console.log('Registration successful:', response);
+    //         this.isGoogleLoading = false;
+    //         this.closeModal();
+    //       },
+    //       error: (error) => {
+    //         console.error('Registration error:', error);
+    //         this.isGoogleLoading = false;
+    //         alert('Google registration failed. Please try again.');
+    //       }
+    //     });
+    //   })
+    //   .catch(error => {
+    //     console.error('Google sign-in error:', error);
+    //     this.isGoogleLoading = false;
+    //     alert('Google sign-in failed. Please try again.');
+    //   });
   }
 
-  mustMatch(controlName: string, matchingControlName: string) {
+  checkPasswordStrength(): void {
+    const password = this.f['password'].value;
+    let strength = 0;
+
+    if (!password) {
+      this.resetPasswordStrength();
+      return;
+    }
+
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    this.passwordStrength = strength;
+    this.updateStrengthIndicator(strength);
+  }
+
+  strengthClass(index: number): string {
+    if (index >= this.passwordStrength) return '';
+    if (this.passwordStrength <= 2) return 'weak';
+    if (this.passwordStrength === 3) return 'medium';
+    return 'strong';
+  }
+
+  private initializeForm(): void {
+    this.registerForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
+      termsAgree: [false, Validators.requiredTrue]
+    }, {
+      validators: this.mustMatch('password', 'confirmPassword')
+    });
+  }
+
+  private mustMatch(controlName: string, matchingControlName: string) {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const control = formGroup.get(controlName);
       const matchingControl = formGroup.get(matchingControlName);
@@ -101,24 +164,13 @@ export class RegisterComponent implements OnInit {
     };
   }
 
-  checkPasswordStrength(): void {
-    const password = this.f['password'].value;
-    let strength = 0;
-    
-    if (!password) {
-      this.strengthText = 'Create a strong password';
-      this.strengthColor = '#5f6368';
-      this.passwordStrength = 0;
-      return;
-    }
-    
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    
-    this.passwordStrength = strength;
-    
+  private resetPasswordStrength(): void {
+    this.strengthText = 'Create a strong password';
+    this.strengthColor = '#5f6368';
+    this.passwordStrength = 0;
+  }
+
+  private updateStrengthIndicator(strength: number): void {
     if (strength <= 2) {
       this.strengthText = 'Weak';
       this.strengthColor = '#ea4335';
@@ -129,12 +181,5 @@ export class RegisterComponent implements OnInit {
       this.strengthText = 'Strong';
       this.strengthColor = '#34a853';
     }
-  }
-  
-  strengthClass(index: number): string {
-    if (index >= this.passwordStrength) return '';
-    if (this.passwordStrength <= 2) return 'weak';
-    if (this.passwordStrength === 3) return 'medium';
-    return 'strong';
   }
 }

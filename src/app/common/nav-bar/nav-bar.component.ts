@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RegisterComponent } from '../register/register.component';
 import { LoginComponent } from '../login/login.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -15,6 +16,7 @@ export class NavBarComponent implements AfterViewInit {
   showRegister = false;
   showLogin = false;
   showForgotPassword = false;
+  isLoggedIn = false;
   
   userEmail = '';
   
@@ -22,8 +24,22 @@ export class NavBarComponent implements AfterViewInit {
   @ViewChild(LoginComponent) loginComponent!: LoginComponent;
   @ViewChild(ForgotPasswordComponent) forgotPasswordComponent!: ForgotPasswordComponent;
   
+  constructor(private authService: AuthService) {
+    this.checkAuthStatus();
+  }
+  
   ngAfterViewInit(): void {
     this.initMobileMenu();
+  }
+  
+  checkAuthStatus(): void {
+    const token = localStorage.getItem('token');
+    this.isLoggedIn = !!token;
+  }
+  
+  logout(): void {
+    localStorage.removeItem('token');
+    this.isLoggedIn = false;
   }
   
   openRegister(): void {
@@ -37,6 +53,7 @@ export class NavBarComponent implements AfterViewInit {
   
   closeRegister(): void {
     this.showRegister = false;
+    this.checkAuthStatus();
   }
   
   openLogin(): void {
@@ -50,6 +67,7 @@ export class NavBarComponent implements AfterViewInit {
   
   closeLogin(): void {
     this.showLogin = false;
+    this.checkAuthStatus();
   }
   
   handleGoToForgotPassword(email: string): void {

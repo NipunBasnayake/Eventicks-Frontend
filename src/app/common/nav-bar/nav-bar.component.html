@@ -83,8 +83,22 @@
         </ul>
 
         <div class="auth-buttons desktop">
-            <button class="register-btn" (click)="openRegister()">Register</button>
-            <button class="sign-in-btn" (click)="openLogin()">Sign In</button>
+            <ng-container *ngIf="!isLoggedIn">
+                <button class="register-btn" (click)="openRegister()">Register</button>
+                <button class="sign-in-btn" (click)="openLogin()">Sign In</button>
+            </ng-container>
+            
+            <ng-container *ngIf="isLoggedIn">
+                <button class="user-menu-btn">
+                    My Account
+                    <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <button class="logout-btn" (click)="logout()">Logout</button>
+            </ng-container>
         </div>
     </div>
 </nav>
