@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -17,8 +18,12 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   isVisible = false;
   submitted = false;
+  isGoogleLoading = false;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -41,6 +46,10 @@ export class LoginComponent implements OnInit {
 
     console.log('Login form submitted:', this.loginForm.value);
     
+    // You would typically call a service method here to handle login
+    // this.authService.login(this.loginForm.value).subscribe(...)
+    
+    // For demo purposes, show success and close
     alert('Login successful!');
     this.closeModal();
   }
@@ -64,19 +73,45 @@ export class LoginComponent implements OnInit {
 
   goToRegister(event: Event): void {
     event.preventDefault();
-    this.isVisible = false;
+    this.isVisible = false; // Hide the modal visually first
+    // Emit the register event - don't close the component yet
+    // Let the parent handle the transition
     this.register.emit();
   }
   
   goToForgotPassword(event: Event): void {
     event.preventDefault();
     this.isVisible = false;
+    // Pass the email value if it exists
     const email = this.f['email'].value || '';
     this.forgotPassword.emit(email);
   }
 
   signInWithGoogle(): void {
-    console.log('Sign in with Google clicked');
-    // this.authService.signInWithGoogle().then(...)
+    // this.isGoogleLoading = true;
+    
+    // this.authService.signInWithGoogle()
+    //   .then(user => {
+    //     console.log('Google user:', user);
+        
+    //     // Process the Google login with your backend
+    //     this.authService.processGoogleLogin(user).subscribe(
+    //       response => {
+    //         console.log('Login successful:', response);
+    //         this.isGoogleLoading = false;
+    //         this.closeModal();
+    //       },
+    //       error => {
+    //         console.error('Login error:', error);
+    //         this.isGoogleLoading = false;
+    //         // Handle error (show message, etc.)
+    //       }
+    //     );
+    //   })
+    //   .catch(error => {
+    //     console.error('Google sign-in error:', error);
+    //     this.isGoogleLoading = false;
+    //     // Handle error (show message, etc.)
+    //   });
   }
 }
