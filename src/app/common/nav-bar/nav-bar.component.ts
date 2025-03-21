@@ -5,11 +5,12 @@ import { LoginComponent } from '../login/login.component';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [CommonModule, RegisterComponent, LoginComponent, ForgotPasswordComponent],
+  imports: [CommonModule, RegisterComponent, LoginComponent, ForgotPasswordComponent, RouterLink],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.css'
 })
