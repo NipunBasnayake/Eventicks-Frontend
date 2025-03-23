@@ -46,7 +46,7 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(fullName, email, password).subscribe({
       next: (response) => {
-        alert('Registration successful!');
+        alert('Registration successful! You are now logged in.');
         this.closeModal();
       },
       error: (err) => {
@@ -58,6 +58,17 @@ export class RegisterComponent implements OnInit {
 
   openModal(): void {
     this.isVisible = true;
+    if (this.registerForm) {
+      this.registerForm.reset({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        termsAgree: false
+      });
+      this.submitted = false;
+      this.resetPasswordStrength();
+    }
   }
 
   closeModal(): void {
@@ -80,28 +91,30 @@ export class RegisterComponent implements OnInit {
   }
 
   signInWithGoogle(): void {
-    // this.isGoogleLoading = true;
+    /* 
+    this.isGoogleLoading = true;
 
-    // this.authService.signInWithGoogle()
-    //   .then(user => {
-    //     this.authService.processGoogleLogin(user).subscribe({
-    //       next: (response) => {
-    //         console.log('Registration successful:', response);
-    //         this.isGoogleLoading = false;
-    //         this.closeModal();
-    //       },
-    //       error: (error) => {
-    //         console.error('Registration error:', error);
-    //         this.isGoogleLoading = false;
-    //         alert('Google registration failed. Please try again.');
-    //       }
-    //     });
-    //   })
-    //   .catch(error => {
-    //     console.error('Google sign-in error:', error);
-    //     this.isGoogleLoading = false;
-    //     alert('Google sign-in failed. Please try again.');
-    //   });
+    this.authService.signInWithGoogle()
+      .then(user => {
+        this.authService.processGoogleLogin(user).subscribe({
+          next: (response) => {
+            console.log('Registration successful:', response);
+            this.isGoogleLoading = false;
+            this.closeModal();
+          },
+          error: (error) => {
+            console.error('Registration error:', error);
+            this.isGoogleLoading = false;
+            alert('Google registration failed. Please try again.');
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Google sign-in error:', error);
+        this.isGoogleLoading = false;
+        alert('Google sign-in failed. Please try again.');
+      });
+    */
   }
 
   checkPasswordStrength(): void {

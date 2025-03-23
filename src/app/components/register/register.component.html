@@ -8,7 +8,6 @@
     </div>
     <div class="popup-body">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        
         <div class="form-group" [ngClass]="{'error': submitted && f['fullName'].errors}">
           <label for="fullName">Full Name</label>
           <input type="text" id="fullName" formControlName="fullName" placeholder="Enter your full name" />

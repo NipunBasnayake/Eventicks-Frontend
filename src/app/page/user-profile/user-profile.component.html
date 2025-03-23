@@ -1,0 +1,991 @@
+<div class="profile-container">
+    <!-- Profile Header Section -->
+    <div class="profile-header">
+      <div class="profile-info">
+        <div class="profile-picture-container">
+          <div class="profile-picture-wrapper">
+            <!-- Profile picture -->
+            <img src="assets/images/default-avatar.png" alt="Profile Picture" class="profile-picture">
+            
+            <!-- Edit icon -->
+            <div class="edit-picture-icon" id="openProfilePictureSelector">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </div>
+            
+            <!-- Save button that appears during edit mode -->
+            <div class="save-picture-btn" id="saveProfilePicture">Save</div>
+          </div>
+          
+          <!-- Hidden file input -->
+          <input type="file" id="profilePictureInput" accept="image/*" style="display: none">
+          
+          <!-- Cancel button for edit mode -->
+          <button class="cancel-edit-btn" id="cancelProfilePictureEdit" style="display: none">
+            Cancel
+          </button>
+        </div>
+        
+        <div class="profile-details">
+          <h2 id="userFullName">John Doe</h2>
+          <p class="user-role-badge role-organizer" id="userRoleBadge">ORGANIZER</p>
+          
+          <div class="email-verification" id="emailVerificationSection">
+            <p class="verification-text">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+              </svg>
+              Email not verified
+            </p>
+            <button class="verify-email-btn" id="sendVerificationEmail">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 2L11 13"></path>
+                <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+              </svg>
+              Send Verification Code
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Profile Navigation -->
+    <div class="profile-nav">
+      <button class="nav-btn active" data-tab="personal">Personal Details</button>
+      <button class="nav-btn" data-tab="tickets">My Tickets</button>
+      <button class="nav-btn" data-tab="bids">My Bids</button>
+      <button class="nav-btn" data-tab="security">Security</button>
+      
+      <!-- Organizer specific tabs -->
+      <button class="nav-btn organizer-tab" data-tab="dashboard">Dashboard</button>
+      <button class="nav-btn organizer-tab" data-tab="events">My Events</button>
+      
+      <!-- Admin specific tabs -->
+      <button class="nav-btn admin-tab" data-tab="requests">User Requests</button>
+      <button class="nav-btn admin-tab" data-tab="tickets-review">Ticket Reviews</button>
+    </div>
+  
+    <!-- Profile Content Area -->
+    <div class="profile-content">
+      <!-- Personal Details Tab -->
+      <div id="personal" class="personal-details tab-content active">
+        <h3>Personal Information</h3>
+        <form id="personalInfoForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+              <div class="error-message fullName-error">Full name is required</div>
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" placeholder="Enter your email" required>
+              <div class="error-message email-error">Please enter a valid email</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+            </div>
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input type="text" id="location" name="location" placeholder="Enter your location">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="bio">About Me</label>
+            <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="save-btn" id="savePersonalInfo">Save Changes</button>
+          </div>
+        </form>
+  
+        <!-- Organizer Request Button (Only for regular users) -->
+        <div class="organizer-request-section" id="organizerRequestSection">
+          <h3>Become an Event Organizer</h3>
+          <p>Want to host and manage your own events? Submit a request to become an organizer.</p>
+          <button class="request-organizer-btn" id="requestOrganizerRole">
+            <span>Submit Request</span>
+          </button>
+        </div>
+      </div>
+  
+      <!-- Tickets Tab -->
+      <div id="tickets" class="tickets-tab tab-content">
+        <h3>My Tickets</h3>
+        <div class="tickets-filter">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+          <button class="filter-btn" data-filter="past">Past</button>
+        </div>
+        
+        <div id="noTicketsMessage" class="no-tickets-message">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="12" rx="2" ry="2"></rect>
+            <line x1="2" y1="7" x2="5" y2="7"></line>
+            <line x1="2" y1="11" x2="5" y2="11"></line>
+            <line x1="19" y1="7" x2="22" y2="7"></line>
+            <line x1="19" y1="11" x2="22" y2="11"></line>
+            <rect x="8" y="16" width="8" height="4" rx="1" ry="1"></rect>
+          </svg>
+          <p>You haven't purchased any tickets yet</p>
+          <button class="browse-events-btn" id="browseEvents">Browse Events</button>
+        </div>
+        
+        <div class="tickets-grid" id="ticketsGrid">
+          <!-- Sample ticket card - will be populated dynamically -->
+          <div class="ticket-card">
+            <div class="ticket-image-wrapper">
+              <img src="assets/images/sample-event.jpg" alt="Event Title" class="ticket-image">
+              <div class="ticket-overlay"></div>
+              <div class="ticket-date-badge">
+                <span class="ticket-day">15</span>
+                <span class="ticket-month">Aug</span>
+              </div>
+              <div class="ticket-type-badge">VIP</div>
+            </div>
+            
+            <div class="ticket-content">
+              <h4 class="ticket-title">Summer Music Festival 2025</h4>
+              <ul class="ticket-details">
+                <li class="ticket-detail">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>6:00 PM</span>
+                </li>
+                <li class="ticket-detail">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span>Colombo Exhibition Center</span>
+                </li>
+                <li class="ticket-detail">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                    <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                    <path d="M18 12a2 2 0 0 0 0 4h4v-4z"></path>
+                  </svg>
+                  <span>15,000 LKR</span>
+                </li>
+              </ul>
+              
+              <div class="ticket-actions">
+                <button class="view-ticket-btn" data-ticket-id="1">View Ticket</button>
+                <button class="download-ticket-btn" data-ticket-id="1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Add more ticket cards as needed -->
+        </div>
+      </div>
+      
+      <!-- Bids Tab -->
+      <div id="bids" class="bids-tab tab-content">
+        <h3>My Bids</h3>
+        <div class="bids-filter">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="active">Active</button>
+          <button class="filter-btn" data-filter="won">Won</button>
+          <button class="filter-btn" data-filter="lost">Lost</button>
+        </div>
+        
+        <div id="noBidsMessage" class="no-bids-message">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+          </svg>
+          <p>You haven't placed any bids yet</p>
+          <button class="browse-auctions-btn" id="browseAuctions">Browse Auctions</button>
+        </div>
+        
+        <div class="bids-table-container" id="bidsTableContainer">
+          <table class="bids-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Ticket Type</th>
+                <th>Your Bid</th>
+                <th>Highest Bid</th>
+                <th>End Time</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="bidsTableBody">
+              <!-- Sample bid row - will be populated dynamically -->
+              <tr class="winning-bid">
+                <td>Summer Music Festival</td>
+                <td>VIP</td>
+                <td>15,000 LKR</td>
+                <td>15,000 LKR</td>
+                <td>Mar 25, 2025, 6:00 PM</td>
+                <td>
+                  <span class="bid-status status-won">WON</span>
+                </td>
+                <td>
+                  <button class="pay-bid-btn" data-bid-id="1">Pay Now</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Tech Conference 2025</td>
+                <td>Premium</td>
+                <td>8,500 LKR</td>
+                <td>9,000 LKR</td>
+                <td>Mar 30, 2025, 11:59 PM</td>
+                <td>
+                  <span class="bid-status status-active">ACTIVE</span>
+                </td>
+                <td>
+                  <button class="update-bid-btn" data-bid-id="2">Update Bid</button>
+                </td>
+              </tr>
+              <!-- Add more bid rows as needed -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Security Tab -->
+      <div id="security" class="security-tab tab-content">
+        <h3>Security Settings</h3>
+        
+        <div class="security-section">
+          <h4>Change Password</h4>
+          <form id="passwordForm">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter your current password" required>
+              <div class="error-message currentPassword-error">Current password is required</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" name="newPassword" placeholder="Enter your new password" required minlength="8">
+              <div class="password-strength">
+                <div class="strength-bar" id="strengthBar1"></div>
+                <div class="strength-bar" id="strengthBar2"></div>
+                <div class="strength-bar" id="strengthBar3"></div>
+                <div class="strength-bar" id="strengthBar4"></div>
+              </div>
+              <div class="strength-text" id="strengthText">Password strength: Weak</div>
+              <div class="error-message newPassword-error">New password must be at least 8 characters</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your new password" required>
+              <div class="error-message confirmPassword-error">Passwords do not match</div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="change-password-btn" id="changePassword">Update Password</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="security-section">
+          <h4>Two-Factor Authentication</h4>
+          <div class="two-factor-toggle">
+            <label class="switch">
+              <input type="checkbox" id="twoFactorToggle">
+              <span class="slider round"></span>
+            </label>
+            <span id="twoFactorStatus">Disabled</span>
+          </div>
+          <p class="security-description">Two-factor authentication adds an extra layer of security to your account by requiring a verification code in addition to your password when you log in.</p>
+        </div>
+        
+        <div class="security-section">
+          <h4>Login Activity</h4>
+          <table class="login-activity-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Device</th>
+                <th>IP Address</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody id="loginActivityTableBody">
+              <!-- Sample login activity - will be populated dynamically -->
+              <tr>
+                <td>Mar 22, 2025, 9:45 AM</td>
+                <td>Chrome on Windows</td>
+                <td>192.168.1.1</td>
+                <td>Colombo, Sri Lanka</td>
+              </tr>
+              <tr>
+                <td>Mar 20, 2025, 3:22 PM</td>
+                <td>Safari on macOS</td>
+                <td>192.168.1.5</td>
+                <td>Colombo, Sri Lanka</td>
+              </tr>
+              <!-- Add more login activity rows as needed -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Organizer Dashboard Tab -->
+      <div id="dashboard" class="dashboard-tab tab-content">
+        <h3>Organizer Dashboard</h3>
+        
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-icon event-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h4>Total Events</h4>
+              <p class="stat-value" id="totalEventsValue">12</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon ticket-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h4>Tickets Sold</h4>
+              <p class="stat-value" id="ticketsSoldValue">487</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon revenue-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h4>Total Revenue</h4>
+              <p class="stat-value" id="totalRevenueValue">2,450,000 LKR</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon bid-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 7 23 1 17 1"></polyline>
+                <line x1="16" y1="8" x2="23" y2="1"></line>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h4>Active Bids</h4>
+              <p class="stat-value" id="activeBidsValue">24</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sales-chart-container">
+          <h4>Ticket Sales Trend</h4>
+          <div class="sales-chart" id="salesChart">
+            <!-- Chart would be rendered here using a chart library -->
+            <div class="chart-placeholder">Sales trend visualization would appear here</div>
+          </div>
+        </div>
+        
+        <div class="recent-sales">
+          <h4>Recent Sales</h4>
+          <table class="recent-sales-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Ticket Type</th>
+                <th>Purchase Date</th>
+                <th>Customer</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="recentSalesTableBody">
+              <!-- Sample recent sales - will be populated dynamically -->
+              <tr>
+                <td>Summer Music Festival</td>
+                <td>VIP</td>
+                <td>Mar 22, 2025, 10:15 AM</td>
+                <td>Jane Smith</td>
+                <td>15,000 LKR</td>
+              </tr>
+              <tr>
+                <td>Tech Conference 2025</td>
+                <td>Regular</td>
+                <td>Mar 21, 2025, 3:45 PM</td>
+                <td>John Wilson</td>
+                <td>5,000 LKR</td>
+              </tr>
+              <!-- Add more recent sales rows as needed -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Organizer Events Tab -->
+      <div id="events" class="events-tab tab-content">
+        <div class="events-header">
+          <h3>My Events</h3>
+          <button class="create-event-btn" id="openCreateEventModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Create Event
+          </button>
+        </div>
+        
+        <div class="events-filter">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="active">Active</button>
+          <button class="filter-btn" data-filter="past">Past</button>
+          <button class="filter-btn" data-filter="draft">Draft</button>
+          <button class="filter-btn" data-filter="pending">Pending Approval</button>
+        </div>
+        
+        <div id="noEventsMessage" class="no-events-message" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <p>You haven't created any events yet</p>
+          <button class="create-first-event-btn" id="createFirstEvent">Create Your First Event</button>
+        </div>
+        
+        <div class="events-table-container" id="eventsTableContainer">
+          <table class="events-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Tickets Sold</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody">
+              <!-- Sample event row - will be populated dynamically -->
+              <tr>
+                <td class="event-cell">
+                  <img src="assets/images/sample-event.jpg" alt="Event Name" class="event-thumbnail">
+                  <span>Summer Music Festival</span>
+                </td>
+                <td>Aug 15, 2025</td>
+                <td>Colombo Exhibition Center</td>
+                <td>156/200</td>
+                <td>
+                  <span class="event-status status-active">ACTIVE</span>
+                </td>
+                <td class="action-cell">
+                  <button class="edit-event-btn" data-event-id="1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button class="view-event-btn" data-event-id="1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                  <button class="manage-tickets-btn" data-event-id="1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td class="event-cell">
+                  <img src="assets/images/sample-event-2.jpg" alt="Event Name" class="event-thumbnail">
+                  <span>Tech Conference 2025</span>
+                </td>
+                <td>Sep 20, 2025</td>
+                <td>Grand Hilton</td>
+                <td>0/300</td>
+                <td>
+                  <span class="event-status status-draft">DRAFT</span>
+                </td>
+                <td class="action-cell">
+                  <button class="edit-event-btn" data-event-id="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button class="view-event-btn" data-event-id="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              <!-- Add more event rows as needed -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Admin User Requests Tab -->
+      <div id="requests" class="requests-tab tab-content">
+        <h3>User Requests</h3>
+        
+        <div class="requests-filter">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="approved">Approved</button>
+          <button class="filter-btn" data-filter="rejected">Rejected</button>
+        </div>
+        
+        <div id="noRequestsMessage" class="no-requests-message" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <p>No organizer requests to display</p>
+        </div>
+        
+        <div class="requests-table-container" id="requestsTableContainer">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Request Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="requestsTableBody">
+              <!-- Sample request row - will be populated dynamically -->
+              <tr>
+                <td class="user-cell">
+                  <img src="assets/images/default-avatar.png" alt="User Name" class="user-avatar">
+                  <span>Sarah Johnson</span>
+                </td>
+                <td>sarah.johnsonexample.com</td>
+                <td>Mar 20, 2025</td>
+                <td>
+                  <span class="request-status status-pending">PENDING</span>
+                </td>
+                <td class="action-cell">
+                  <button class="approve-btn" data-request-id="1">Approve</button>
+                  <button class="reject-btn" data-request-id="1">Reject</button>
+                  <button class="view-user-btn" data-user-id="1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td class="user-cell">
+                  <img src="assets/images/default-avatar.png" alt="User Name" class="user-avatar">
+                  <span>Michael Davies</span>
+                </td>
+                <td>michael.daviesexample.com</td>
+                <td>Mar 18, 2025</td>
+                <td>
+                  <span class="request-status status-approved">APPROVED</span>
+                </td>
+                <td class="action-cell">
+                  <button class="view-user-btn" data-user-id="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              <!-- Add more request rows as needed -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Admin Ticket Reviews Tab -->
+      <div id="tickets-review" class="tickets-review-tab tab-content">
+        <h3>Tickets Pending Review</h3>
+        
+        <div class="tickets-review-filter">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="approved">Approved</button>
+          <button class="filter-btn" data-filter="rejected">Rejected</button>
+        </div>
+        
+        <div id="noReviewsMessage" class="no-reviews-message" style="display:none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <p>No ticket requests to review</p>
+        </div>
+        
+        <div class="tickets-review-list" id="ticketsReviewList">
+          <!-- Sample ticket review card - will be populated dynamically -->
+          <div class="ticket-review-card">
+            <div class="review-header">
+              <h4>Summer Music Festival</h4>
+              <span class="review-status status-pending">PENDING</span>
+            </div>
+            
+            <div class="review-content">
+              <div class="review-details">
+                <div class="organizer-info">
+                  <img src="assets/images/default-avatar.png" alt="Organizer Name" class="organizer-avatar">
+                  <div>
+                    <h5>Organizer</h5>
+                    <p>John Doe</p>
+                  </div>
+                </div>
+                
+                <div class="event-time">
+                  <h5>Event Date & Time</h5>
+                  <p>Aug 15, 2025 at 6:00 PM</p>
+                </div>
+                
+                <div class="event-location">
+                  <h5>Location</h5>
+                  <p>Colombo Exhibition Center</p>
+                </div>
+                
+                <div class="ticket-types">
+                  <h5>Ticket Types</h5>
+                  <ul>
+                    <li><strong>VIP:</strong> 15,000 LKR (50 tickets)</li>
+                    <li><strong>Regular:</strong> 5,000 LKR (150 tickets)</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="event-image-container">
+                <img src="assets/images/sample-event.jpg" alt="Event Name" class="event-preview-image">
+              </div>
+            </div>
+            
+            <div class="review-description">
+              <h5>Event Description</h5>
+              <p>Join us for the biggest music festival of the summer featuring top local and international artists. Experience amazing food, drinks, and unforgettable performances across three stages.</p>
+            </div>
+            
+            <div class="review-actions">
+              <button class="approve-btn" data-review-id="1">Approve Ticket</button>
+              <button class="reject-btn" data-review-id="1" data-action="reject">Reject</button>
+            </div>
+          </div>
+          <!-- Add more ticket review cards as needed -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Email Verification Modal -->
+    <div class="popup-overlay" id="emailVerificationModal">
+      <div class="popup-container">
+        <div class="popup-header">
+          <h2>Verify Your Email</h2>
+          <button type="button" class="close-btn" id="closeEmailVerificationModal">
+            <img width="20" height="20" src="https://img.icons8.com/fluency/48/delete-sign.png" alt="delete-sign"/>
+          </button>
+        </div>
+        <div class="popup-body">
+          <div class="verification-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <p>We've sent a verification code to <strong id="userEmailDisplay">userexample.com</strong>. Please enter the code below to verify your email address.</p>
+          </div>
+          
+          <form id="verificationForm">
+            <div class="form-group verification-code-group">
+              <label for="verificationCode">Verification Code</label>
+              <input type="text" id="verificationCode" name="verificationCode" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required>
+              <div class="error-message verificationCode-error">Verification code is required</div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="verify-btn" id="verifyEmailButton">Verify Email</button>
+            </div>
+          </form>
+          
+          <div class="resend-code">
+            <p>Didn't receive the code? <button class="resend-btn" id="resendVerificationCode">
+              <span id="resendText">Resend Code</span>
+            </button></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Update Bid Modal -->
+    <div class="popup-overlay" id="updateBidModal">
+      <div class="popup-container">
+        <div class="popup-header">
+          <h2>Update Your Bid</h2>
+          <button type="button" class="close-btn" id="closeUpdateBidModal">
+            <img width="20" height="20" src="https://img.icons8.com/fluency/48/delete-sign.png" alt="delete-sign"/>
+          </button>
+        </div>
+        <div class="popup-body">
+          <div class="bid-details" id="selectedBidDetails">
+            <h3 id="bidEventTitle">Summer Music Festival</h3>
+            <p class="ticket-type" id="bidTicketType">VIP Ticket</p>
+            
+            <div class="bid-info">
+              <div class="current-bid">
+                <p>Your Current Bid</p>
+                <h4 id="currentBidAmount">10,000 LKR</h4>
+              </div>
+              <div class="highest-bid">
+                <p>Highest Bid</p>
+                <h4 id="highestBidAmount">12,000 LKR</h4>
+              </div>
+            </div>
+            
+            <form id="updateBidForm">
+              <div class="form-group">
+                <label for="newBidAmount">New Bid Amount (LKR)</label>
+                <input type="number" id="newBidAmount" name="newBidAmount" min="12100" step="100" required>
+                <div class="error-message newBidAmount-error">Your bid must be higher than the current highest bid</div>
+              </div>
+              
+              <div class="min-bid-note">
+                <p>Minimum bid increment: 100 LKR</p>
+              </div>
+              
+              <div class="form-actions">
+                <button type="submit" class="update-bid-btn" id="submitBidUpdate">Update Bid</button>
+              </div>
+            </form>
+            
+            <div class="auction-ends">
+              <p>Auction ends in: <strong id="auctionTimeRemaining">2 days, 5 hours</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Create Event Modal -->
+    <div class="popup-overlay" id="createEventModal">
+      <div class="popup-container event-popup-container">
+        <div class="popup-header">
+          <h2>Create New Event</h2>
+          <button type="button" class="close-btn" id="closeCreateEventModal">
+            <img width="20" height="20" src="https://img.icons8.com/fluency/48/delete-sign.png" alt="delete-sign"/>
+          </button>
+        </div>
+        <div class="popup-body">
+          <form id="eventForm">
+            <div class="form-section">
+              <h3>Event Details</h3>
+              
+              <div class="form-group">
+                <label for="eventTitle">Event Title</label>
+                <input type="text" id="eventTitle" name="title" placeholder="Enter event title" required>
+                <div class="error-message title-error">Event title is required</div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="eventDate">Event Date</label>
+                  <input type="date" id="eventDate" name="date" required>
+                  <div class="error-message date-error">Event date is required</div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="eventTime">Event Time</label>
+                  <input type="time" id="eventTime" name="time" required>
+                  <div class="error-message time-error">Event time is required</div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="eventLocation">Event Location</label>
+                <input type="text" id="eventLocation" name="location" placeholder="Enter event venue/location" required>
+                <div class="error-message location-error">Event location is required</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="eventType">Event Type</label>
+                <select id="eventType" name="type" required>
+                  <option value="">Select event type</option>
+                  <option value="CONCERT">Concert</option>
+                  <option value="THEATER">Theater</option>
+                  <option value="SPORTS">Sports</option>
+                  <option value="CONFERENCE">Conference</option>
+                  <option value="EXHIBITION">Exhibition</option>
+                  <option value="WORKSHOP">Workshop</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                <div class="error-message type-error">Event type is required</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="eventDescription">Event Description</label>
+                <textarea id="eventDescription" name="description" rows="4" placeholder="Describe your event" required></textarea>
+                <div class="error-message description-error">Event description is required</div>
+              </div>
+              
+              <div class="form-group">
+                <label for="eventImage">Event Image</label>
+                <div class="image-upload-container">
+                  <div class="image-preview" id="eventImagePreview" style="display:none;">
+                    <img src="" alt="Event image preview" id="eventImagePreviewImg">
+                    <button type="button" class="remove-image-btn" id="removeEventImage">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  <label for="eventImageInput" class="image-upload-btn" id="imageUploadBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span>Upload Event Image</span>
+                  </label>
+                  <input type="file" id="eventImageInput" name="image" accept="image/*" style="display: none" required>
+                </div>
+                <div class="error-message image-error">Event image is required</div>
+              </div>
+            </div>
+            
+            <div class="form-section">
+              <h3>Ticket Information</h3>
+              
+              <div id="ticketsContainer">
+                <div class="ticket-form-group" data-ticket-index="0">
+                  <div class="ticket-header">
+                    <h4>Ticket Type 1</h4>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="ticketType0">Ticket Name</label>
+                      <input type="text" id="ticketType0" name="tickets[0][type]" placeholder="e.g. Regular, VIP, Premium" required>
+                      <div class="error-message ticket-type-error">Ticket name is required</div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="ticketPrice0">Price (LKR)</label>
+                      <input type="number" id="ticketPrice0" name="tickets[0][price]" min="0" step="100" required>
+                      <div class="error-message ticket-price-error">Ticket price is required</div>
+                    </div>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="ticketQuantity0">Quantity</label>
+                      <input type="number" id="ticketQuantity0" name="tickets[0][quantity]" min="1" required>
+                      <div class="error-message ticket-quantity-error">Ticket quantity is required</div>
+                    </div>
+                    
+                    <div class="form-group bidding-toggle">
+                      <label>Enable Bidding</label>
+                      <div class="toggle-container">
+                        <label class="switch">
+                          <input type="checkbox" id="enableBidding0" name="tickets[0][enableBidding]">
+                          <span class="slider round"></span>
+                        </label>
+                        <span class="toggle-label" id="biddingLabel0">No</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group bidding-fields" id="biddingFields0" style="display:none;">
+                    <label for="minBidPrice0">Minimum Bid Price (LKR)</label>
+                    <input type="number" id="minBidPrice0" name="tickets[0][minBidPrice]" min="0" step="100">
+                    <div class="error-message min-bid-error">Minimum bid price is required when bidding is enabled</div>
+                  </div>
+                  
+                  <div class="ticket-description">
+                    <label for="ticketDescription0">Description (Optional)</label>
+                    <textarea id="ticketDescription0" name="tickets[0][description]" rows="2" placeholder="Describe what's included with this ticket"></textarea>
+                  </div>
+                </div>
+              </div>
+              
+              <button type="button" class="add-ticket-btn" id="addTicket">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Another Ticket Type
+              </button>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="save-draft-btn" id="saveEventAsDraft">Save as Draft</button>
+              <button type="submit" class="submit-event-btn">Submit for Review</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Reject Reason Modal -->
+    <div class="popup-overlay" id="rejectReasonModal">
+      <div class="popup-container">
+        <div class="popup-header">
+          <h2>Provide Rejection Reason</h2>
+          <button type="button" class="close-btn" id="closeRejectReasonModal">
+            <img width="20" height="20" src="https://img.icons8.com/fluency/48/delete-sign.png" alt="delete-sign"/>
+          </button>
+        </div>
+        <div class="popup-body">
+          <form id="rejectReasonForm">
+            <input type="hidden" id="rejectItemId" name="itemId">
+            <input type="hidden" id="rejectItemType" name="itemType">
+            
+            <div class="form-group">
+              <label for="rejectReason">Reason for Rejection</label>
+              <textarea id="rejectReason" name="reason" rows="4" placeholder="Provide detailed feedback to the organizer" required></textarea>
+              <div class="error-message reason-error">Rejection reason is required</div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="reject-btn" id="submitRejectReason">Submit Rejection</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

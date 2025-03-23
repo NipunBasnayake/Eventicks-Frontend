@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NavBarComponent } from "../../common/nav-bar/nav-bar.component";
-import { Event } from '../../models/event';
-import { FooterComponent } from "../../common/footer/footer.component";
+import { NavBarComponent } from "../../components/nav-bar/nav-bar.component";
+import { Event } from '../../models/Event';
+import { FooterComponent } from "../../components/footer/footer.component";
 
 @Component({
   selector: 'app-landing',

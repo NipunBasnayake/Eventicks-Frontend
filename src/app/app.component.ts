@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { RegisterComponent } from "./common/register/register.component";
-import { LoginComponent } from "./common/login/login.component";
-import { NavBarComponent } from "./common/nav-bar/nav-bar.component";
-import { ForgotPasswordComponent } from "./common/forgot-password/forgot-password.component";
+import { UserProfileComponent } from "./page/user-profile/user-profile.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet
-  ],
+    RouterOutlet,
+    UserProfileComponent
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
