@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, 
 import { CommonModule } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -34,7 +35,12 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   strengthText: string = 'Create a strong password';
   strengthColor: string = '#5f6368';
 
-  constructor(private fb: FormBuilder) { }
+  userEmail: string = '';
+  
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.initForms();
@@ -113,15 +119,23 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       return;
     }
     
+    const email = this.emailForm.value.email;
+    this.userEmail = email;
     this.isOtpSending = true;
     
-    setTimeout(() => {
-      this.isOtpSending = false;
-      this.currentStage = 2;
-      this.emailSubmitted = false;
-      this.startCountdown();
-      console.log('OTP sent to', this.emailForm.value.email);
-    }, 1500);
+    this.authService.forgotPassword(email).subscribe({
+      next: (response) => {
+        console.log('OTP sent to', email);
+        this.isOtpSending = false;
+        this.currentStage = 2;
+        this.emailSubmitted = false;
+        this.startCountdown();
+      },
+      error: (error) => {
+        console.error('Error sending OTP:', error);
+        this.isOtpSending = false;
+      }
+    });
   }
   
   verifyOTP(): void {
@@ -131,12 +145,19 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       return;
     }
     
-    setTimeout(() => {
-      this.currentStage = 3;
-      this.otpSubmitted = false;
-      this.stopCountdown();
-      console.log('OTP verified:', this.otpForm.value.otp);
-    }, 500);
+    const otp = this.otpForm.value.otp;
+    
+    this.authService.verifyOtp(this.userEmail, otp).subscribe({
+      next: (response) => {
+        console.log('OTP verified:', otp);
+        this.currentStage = 3;
+        this.otpSubmitted = false;
+        this.stopCountdown();
+      },
+      error: (error) => {
+        console.error('Error verifying OTP:', error);
+      }
+    });
   }
   
   resetPassword(): void {
@@ -146,22 +167,35 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       return;
     }
     
-    setTimeout(() => {
-      console.log('Password reset successful', this.passwordForm.value.password);
-      alert('Password has been reset successfully!');
-      this.backToLogin();
-    }, 800);
+    const newPassword = this.passwordForm.value.password;
+    
+    this.authService.resetPassword(this.userEmail, newPassword).subscribe({
+      next: (response) => {
+        console.log('Password reset successful');
+        alert('Password has been reset successfully!');
+        this.backToLogin();
+      },
+      error: (error) => {
+        console.error('Error resetting password:', error);
+      }
+    });
   }
   
   resendOTP(event: Event): void {
     event.preventDefault();
     this.isOtpSending = true;
     
-    setTimeout(() => {
-      this.isOtpSending = false;
-      this.startCountdown();
-      console.log('OTP resent to', this.emailForm.value.email);
-    }, 1500);
+    this.authService.forgotPassword(this.userEmail).subscribe({
+      next: (response) => {
+        console.log('OTP resent to', this.userEmail);
+        this.isOtpSending = false;
+        this.startCountdown();
+      },
+      error: (error) => {
+        console.error('Error resending OTP:', error);
+        this.isOtpSending = false;
+      }
+    });
   }
   
   startCountdown(): void {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -56,22 +57,9 @@ export class AuthService {
     });
   }
 
-  // Google Sign-in method as stub
   signInWithGoogle(): Promise<any> {
-    // Google Sign-In implementation would go here
     return Promise.resolve({});
   }
-
-  // Google login processing method commented out
-  /*
-  processGoogleLogin(user: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/google-auth`, { user }).pipe(
-      tap(response => {
-        this.currentUserSubject.next(response.data || response);
-      })
-    );
-  }
-  */
 
   logout(): void {
     localStorage.removeItem('user');
@@ -97,7 +85,6 @@ export class AuthService {
         return parsedUser;
       }
     }
-    
     return null;
   }
 
@@ -120,5 +107,45 @@ export class AuthService {
   
   isInMemoryOnly(): boolean {
     return this.inMemoryOnly;
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    const params = new HttpParams().set('email', email);
+    
+    return this.http.post<any>(
+      `${this.apiUrl}/auth/forgot`, 
+      null, 
+      { params }
+    ).pipe(
+      map(response => response.data)
+    );
+  }
+
+  verifyOtp(email: string, otp: string): Observable<any> {
+    const body = {
+      email: email,
+      otp: otp
+    };
+    
+    return this.http.post<any>(
+      `${this.apiUrl}/auth/verify-otp`, 
+      body
+    ).pipe(
+      map(response => response.data)
+    );
+  }
+
+  resetPassword(email: string, newPassword: string): Observable<any> {
+    const body = {
+      email: email,
+      newPassword: newPassword
+    };
+    
+    return this.http.post<any>(
+      `${this.apiUrl}/auth/reset-password`, 
+      body
+    ).pipe(
+      map(response => response.data)
+    );
   }
 }
