@@ -47,7 +47,6 @@ export class RegisterComponent implements OnInit {
     this.authService.register(fullName, email, password).subscribe({
       next: (response) => {
         this.closeModal();
-        // Load login form
         this.loadLoginForm();
       },
       error: (err) => {

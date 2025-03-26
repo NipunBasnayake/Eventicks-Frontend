@@ -1,7 +1,24 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { ProfileService } from '../../services/profile.service';
+
+interface UserProfileResponse {
+  success: boolean;
+  message: string;
+  data: {
+    userId: number;
+    name: string;
+    email: string;
+    role: string;
+    isEmailVerified: boolean;
+    lastLoginAt: string;
+    registeredAt: string;
+    token: string | null;
+  };
+}
 
 @Component({
   selector: 'app-user-profile',
@@ -11,22 +28,22 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-profile.component.css']
 })
 export class UserProfileComponent implements OnInit {
-  userFullName: string = 'John Doe';
+  userFullName: string = '';
   userRole: string = 'USER';
+  userEmail: string = '';
+  userId: number = 0;
   isEmailVerified: boolean = false;
-  activeTab: string = 'personal';
+  registeredDate: string = '';
+  lastLoginDate: string = '';
+  activeTab: string = 'tickets';
   
   personalInfo = {
-    fullName: 'John Doe',
-    email: 'johndoe@example.com',
+    fullName: '',
+    email: '',
     phone: '',
     location: '',
     bio: ''
   };
-
-  @ViewChild('fileInput') fileInput!: ElementRef;
-  isEditingPicture: boolean = false;
-  newProfilePicture: File | null = null;
 
   tickets: any[] = [];
   ticketsFilter: string = 'all';
@@ -73,30 +90,87 @@ export class UserProfileComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private profileService: ProfileService
+  ) { }
 
   ngOnInit(): void {
-    this.loadUserData();
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.userEmail = this.authService.getUserEmail() || '';
+    
+    if (this.userEmail) {
+      this.loadUserData();
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 
   loadUserData(): void {
+    this.authService.getUserProfile(this.userEmail).subscribe({
+      next: (response: UserProfileResponse) => {
+        if (response.success && response.data) {
+          const userData = response.data;
+          
+          this.userId = userData.userId;
+          this.userFullName = userData.name;
+          this.userRole = userData.role;
+          this.userEmail = userData.email;
+          this.isEmailVerified = userData.isEmailVerified;
+          
+          this.lastLoginDate = this.formatDate(userData.lastLoginAt);
+          this.registeredDate = this.formatDate(userData.registeredAt);
+          
+          this.personalInfo = {
+            fullName: userData.name,
+            email: userData.email,
+            phone: '',
+            location: '',
+            bio: ''
+          };
+        }
+      },
+      error: (err) => {
+        console.error('Error loading user profile:', err);
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return dateString;
+    }
   }
 
   setActiveTab(tab: string): void {
     this.activeTab = tab;
+    
+    if (tab === 'tickets') {
+      this.loadTickets(this.ticketsFilter);
+    } else if (tab === 'bids') {
+      this.loadBids(this.bidsFilter);
+    }
   }
 
-  savePersonalInfo(): void {
-    this.formErrors.fullName = !this.personalInfo.fullName;
-    this.formErrors.email = !this.validateEmail(this.personalInfo.email);
-    
-    if (this.formErrors.fullName || this.formErrors.email) {
-      return;
-    }
-    
-    this.userFullName = this.personalInfo.fullName;
-    alert('Personal information saved successfully!');
+  goToOrganizerDashboard(): void {
+    this.router.navigate(['/organizer/dashboard']);
   }
 
   validateEmail(email: string): boolean {
@@ -104,39 +178,36 @@ export class UserProfileComponent implements OnInit {
     return emailRegex.test(email);
   }
 
-  startEditingPicture(): void {
-    this.isEditingPicture = true;
-  }
-
-  cancelEditPicture(): void {
-    this.isEditingPicture = false;
-    this.newProfilePicture = null;
-  }
-
-  openFileSelector(): void {
-    this.fileInput.nativeElement.click();
-  }
-
-  handleFileInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.newProfilePicture = input.files[0];
-    }
-  }
-
-  saveProfilePicture(): void {
-    if (this.newProfilePicture) {
-      this.isEditingPicture = false;
-      this.newProfilePicture = null;
-    }
-  }
-
   requestOrganizerRole(): void {
-    alert('Organizer role request submitted. We will review your request shortly.');
+    this.profileService.requestOrganizerRole(this.userId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          alert('Organizer role request submitted. We will review your request shortly.');
+        } else {
+          alert('Failed to submit request: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error requesting organizer role:', err);
+        alert('Failed to submit request. Please try again.');
+      }
+    });
   }
 
   sendVerificationEmail(): void {
-    this.showEmailVerificationModal = true;
+    this.profileService.sendVerificationEmail(this.userEmail).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.showEmailVerificationModal = true;
+        } else {
+          alert('Failed to send verification email: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error sending verification email:', err);
+        alert('Failed to send verification email. Please try again.');
+      }
+    });
   }
 
   verifyEmail(code: string): void {
@@ -146,13 +217,37 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     
-    this.isEmailVerified = true;
-    this.showEmailVerificationModal = false;
-    alert('Email verified successfully!');
+    this.profileService.verifyEmail(this.userEmail, code).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.isEmailVerified = true;
+          this.showEmailVerificationModal = false;
+          alert('Email verified successfully!');
+        } else {
+          alert('Failed to verify email: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error verifying email:', err);
+        alert('Failed to verify email. Please check the code and try again.');
+      }
+    });
   }
 
   resendVerificationCode(): void {
-    alert('A new verification code has been sent to your email.');
+    this.profileService.sendVerificationEmail(this.userEmail).subscribe({
+      next: (response) => {
+        if (response.success) {
+          alert('A new verification code has been sent to your email.');
+        } else {
+          alert('Failed to send verification code: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error sending verification code:', err);
+        alert('Failed to send verification code. Please try again.');
+      }
+    });
   }
 
   updatePassword(currentPassword: string, newPassword: string, confirmPassword: string): void {
@@ -164,11 +259,22 @@ export class UserProfileComponent implements OnInit {
       return;
     }
 
-    alert('Password updated successfully!');
-
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
+    this.profileService.updatePassword(this.userId, currentPassword, newPassword).subscribe({
+      next: (response) => {
+        if (response.success) {
+          alert('Password updated successfully!');
+          this.currentPassword = '';
+          this.newPassword = '';
+          this.confirmPassword = '';
+        } else {
+          alert('Failed to update password: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error updating password:', err);
+        alert('Failed to update password. Please check your current password and try again.');
+      }
+    });
   }
 
   checkPasswordStrength(password: string): void {
@@ -186,24 +292,72 @@ export class UserProfileComponent implements OnInit {
     if (/[a-z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
-    
+   
     if (score < 3) this.passwordStrength = 'Weak';
     else if (score < 5) this.passwordStrength = 'Medium';
     else this.passwordStrength = 'Strong';
-    
+   
     this.updateStrengthBars(score);
   }
 
   updateStrengthBars(score: number): void {
+    const strengthBars = document.querySelectorAll('.strength-bar');
+    const strengthText = document.querySelector('.strength-text');
+    
+    if (strengthText) {
+      strengthText.textContent = `Password strength: ${this.passwordStrength}`;
+    }
+    
+    strengthBars.forEach((bar, index) => {
+      if (index < score) {
+        if (score < 3) {
+          bar.classList.add('weak');
+          bar.classList.remove('medium', 'strong');
+        } else if (score < 5) {
+          bar.classList.add('medium');
+          bar.classList.remove('weak', 'strong');
+        } else {
+          bar.classList.add('strong');
+          bar.classList.remove('weak', 'medium');
+        }
+      } else {
+        bar.classList.remove('weak', 'medium', 'strong');
+      }
+    });
   }
 
   toggleTwoFactor(): void {
-    this.twoFactorEnabled = !this.twoFactorEnabled;
-    alert(`Two-factor authentication ${this.twoFactorEnabled ? 'enabled' : 'disabled'}.`);
+    this.profileService.toggleTwoFactor(this.userId, !this.twoFactorEnabled).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.twoFactorEnabled = !this.twoFactorEnabled;
+          alert(`Two-factor authentication ${this.twoFactorEnabled ? 'enabled' : 'disabled'}.`);
+        } else {
+          alert('Failed to toggle two-factor authentication: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error toggling two-factor:', err);
+        alert('Failed to toggle two-factor authentication. Please try again.');
+      }
+    });
   }
 
   filterTickets(filter: string): void {
     this.ticketsFilter = filter;
+    this.loadTickets(filter);
+  }
+
+  loadTickets(filter: string): void {
+    this.profileService.getUserTickets(this.userId, filter).subscribe({
+      next: (tickets) => {
+        this.tickets = tickets || [];
+      },
+      error: (err) => {
+        console.error('Error loading tickets:', err);
+        this.tickets = [];
+      }
+    });
   }
 
   browseEvents(): void {
@@ -212,6 +366,19 @@ export class UserProfileComponent implements OnInit {
 
   filterBids(filter: string): void {
     this.bidsFilter = filter;
+    this.loadBids(filter);
+  }
+
+  loadBids(filter: string): void {
+    this.profileService.getUserBids(this.userId, filter).subscribe({
+      next: (bids) => {
+        this.bids = bids || [];
+      },
+      error: (err) => {
+        console.error('Error loading bids:', err);
+        this.bids = [];
+      }
+    });
   }
 
   browseAuctions(): void {
@@ -231,11 +398,24 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     
-    if (this.selectedBid) {
-      this.selectedBid.amount = newAmount;
-      this.showUpdateBidModal = false;
-      alert('Bid updated successfully!');
-    }
+    this.profileService.updateBid(this.selectedBid.id, this.userId, newAmount).subscribe({
+      next: (response) => {
+        if (response.success) {
+          if (this.selectedBid) {
+            this.selectedBid.amount = newAmount;
+            this.showUpdateBidModal = false;
+            alert('Bid updated successfully!');
+            this.loadBids(this.bidsFilter);
+          }
+        } else {
+          alert('Failed to update bid: ' + response.message);
+        }
+      },
+      error: (err) => {
+        console.error('Error updating bid:', err);
+        alert('Failed to update bid. Please try again.');
+      }
+    });
   }
 
   closeEmailVerificationModal(): void {
