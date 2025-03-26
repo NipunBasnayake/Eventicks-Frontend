@@ -18,26 +18,30 @@
             </svg>
             Email not verified
           </p>
-          <button class="verify-email-btn" (click)="sendVerificationEmail()">
+          <button class="verify-email-btn" (click)="sendVerificationEmail()" [disabled]="isEmailSending">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 2L11 13"></path>
               <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
             </svg>
-            Send Verification Code
+            {{ isEmailSending ? 'Sending...' : 'Send Verification Email' }}
           </button>
+          <div class="verification-message" *ngIf="emailVerificationMessage">
+            {{ emailVerificationMessage }}
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="profile-nav">
+    <button class="nav-btn" [class.active]="activeTab === 'personal'" (click)="setActiveTab('personal')">Become an Event Organizer</button>
     <button class="nav-btn" [class.active]="activeTab === 'tickets'" (click)="setActiveTab('tickets')">My Tickets</button>
     <button class="nav-btn" [class.active]="activeTab === 'bids'" (click)="setActiveTab('bids')">My Bids</button>
-    <button class="nav-btn" [class.active]="activeTab === 'personal'" (click)="setActiveTab('personal')">Become an Event Organizer</button>
     <button class="nav-btn" [class.active]="activeTab === 'security'" (click)="setActiveTab('security')">Security</button>
   </div>
 
   <div class="profile-content">
+    <!-- Become an Event Organizer Tab -->
     <div *ngIf="activeTab === 'personal'" class="personal-details tab-content">
       <div class="organizer-request-section" *ngIf="userRole === 'USER'">
         <h3>Become an Event Organizer</h3>
@@ -55,14 +59,26 @@
         <div class="organizer-requirements">
           <h4>Requirements:</h4>
           <ul>
-            <li>Verified email address</li>
+            <li>Verified email address <span class="verification-status" [ngClass]="{'verified': isEmailVerified, 'unverified': !isEmailVerified}">{{ isEmailVerified ? '(Verified)' : '(Not Verified)' }}</span></li>
             <li>Complete profile information</li>
             <li>Valid payment information</li>
           </ul>
         </div>
-        <button class="request-organizer-btn" (click)="requestOrganizerRole()">
+        <div *ngIf="!isEmailVerified" class="email-verification-alert">
+          <p>You need to verify your email address before becoming an organizer.</p>
+          <button class="send-verification-btn" (click)="sendVerificationEmail()" [disabled]="isEmailSending">
+            {{ isEmailSending ? 'Sending...' : 'Send Verification Email' }}
+          </button>
+          <div class="verification-message" *ngIf="emailVerificationMessage">
+            {{ emailVerificationMessage }}
+          </div>
+        </div>
+        <button class="request-organizer-btn" (click)="requestOrganizerRole()" [disabled]="!isEmailVerified">
           <span>Submit Request</span>
         </button>
+        <div *ngIf="!isEmailVerified" class="verification-required-message">
+          Email verification is required to submit a request
+        </div>
       </div>
       
       <div class="account-info-section" *ngIf="userRole === 'ORGANIZER'">
@@ -74,6 +90,7 @@
       </div>
     </div>
 
+    <!-- My Tickets Tab -->
     <div *ngIf="activeTab === 'tickets'" class="tickets-tab tab-content">
       <h3>My Tickets</h3>
       <div class="tickets-filter">
@@ -113,6 +130,7 @@
       </div>
     </div>
     
+    <!-- My Bids Tab -->
     <div *ngIf="activeTab === 'bids'" class="bids-tab tab-content">
       <h3>My Bids</h3>
       <div class="bids-filter">
@@ -164,8 +182,30 @@
       </div>
     </div>
     
+    <!-- Security Tab -->
     <div *ngIf="activeTab === 'security'" class="security-tab tab-content">
       <h3>Security Settings</h3>
+      
+      <div class="security-section">
+        <h4>Email Verification</h4>
+        <div class="email-verification-status">
+          <div class="status-indicator">
+            <span class="status-label">Status:</span>
+            <span class="status-value" [ngClass]="{'verified': isEmailVerified, 'not-verified': !isEmailVerified}">
+              {{ isEmailVerified ? 'Verified' : 'Not Verified' }}
+            </span>
+          </div>
+          <button *ngIf="!isEmailVerified" class="verify-now-btn" (click)="sendVerificationEmail()" [disabled]="isEmailSending">
+            {{ isEmailSending ? 'Sending...' : 'Send Verification Email' }}
+          </button>
+          <div class="verification-message" *ngIf="emailVerificationMessage">
+            {{ emailVerificationMessage }}
+          </div>
+          <p class="verification-info" *ngIf="!isEmailVerified">
+            Verifying your email helps secure your account and allows you to request organizer status.
+          </p>
+        </div>
+      </div>
       
       <div class="security-section">
         <h4>Change Password</h4>
@@ -237,47 +277,7 @@
     </div>
   </div>
   
-  <div class="popup-overlay" [class.show]="showEmailVerificationModal">
-    <div class="popup-container">
-      <div class="popup-header">
-        <h2>Verify Your Email</h2>
-        <button type="button" class="close-btn" (click)="closeEmailVerificationModal()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="popup-body">
-        <div class="verification-message">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          <p>We've sent a verification code to <strong>{{ userEmail }}</strong>. Please enter the code below to verify your email address.</p>
-        </div>
-        
-        <form (ngSubmit)="verifyEmail(verificationCode)">
-          <div class="form-group verification-code-group">
-            <label for="verificationCode">Verification Code</label>
-            <input type="text" id="verificationCode" name="verificationCode" [(ngModel)]="verificationCode" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required>
-            <div class="error-message" [style.display]="formErrors.verificationCode ? 'block' : 'none'">Please enter a valid 6-digit code</div>
-          </div>
-          
-          <div class="form-actions">
-            <button type="submit" class="verify-btn">Verify Email</button>
-          </div>
-        </form>
-        
-        <div class="resend-code">
-          <p>Didn't receive the code? <button class="resend-btn" (click)="resendVerificationCode()">
-            <span>Resend Code</span>
-          </button></p>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+  <!-- Bid Update Modal -->
   <div class="popup-overlay" [class.show]="showUpdateBidModal">
     <div class="popup-container">
       <div class="popup-header">
