@@ -46,9 +46,7 @@ export class ProfileService {
     );
   }
 
-  sendVerificationEmail(email: string): Observable<any> {
-    console.log('Sending verification email to:', email);
-    
+  sendVerificationEmail(email: string): Observable<any> {    
     return this.http.post(`${this.apiUrl}/auth/send-verification-email`, null,
       { 
         headers: this.getHeaders(),
