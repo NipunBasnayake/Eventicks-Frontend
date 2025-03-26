@@ -52,11 +52,8 @@ export class UserProfileComponent implements OnInit {
   bidsFilter: string = 'all';
   newBidAmount: number = 0;
 
-  showEmailVerificationModal: boolean = false;
   showUpdateBidModal: boolean = false;
   selectedBid: any = null;
-
-  verificationCode: string = '';
 
   currentPassword: string = '';
   newPassword: string = '';
@@ -69,11 +66,12 @@ export class UserProfileComponent implements OnInit {
     currentPassword: false,
     newPassword: false,
     confirmPassword: false,
-    verificationCode: false,
     newBidAmount: false
   };
 
   twoFactorEnabled: boolean = false;
+  isEmailSending: boolean = false;
+  emailVerificationMessage: string = '';
 
   loginActivity: any[] = [
     {
@@ -113,7 +111,7 @@ export class UserProfileComponent implements OnInit {
 
   loadUserData(): void {
     this.authService.getUserProfile(this.userEmail).subscribe({
-      next: (response: UserProfileResponse) => {
+      next: (response: UserProfileResponse) => {        
         if (response.success && response.data) {
           const userData = response.data;
           
@@ -140,6 +138,22 @@ export class UserProfileComponent implements OnInit {
         this.router.navigate(['/login']);
       }
     });
+  }
+
+  refreshVerificationStatus(): void {
+    if (this.userEmail) {
+      this.profileService.checkEmailVerification(this.userEmail).subscribe({
+        next: (response) => {
+          console.log('Verification status response:', response);
+          if (response.success) {
+            this.isEmailVerified = response.data;
+          }
+        },
+        error: (err) => {
+          console.error('Error checking verification status:', err);
+        }
+      });
+    }
   }
 
   formatDate(dateString: string): string {
@@ -179,6 +193,11 @@ export class UserProfileComponent implements OnInit {
   }
 
   requestOrganizerRole(): void {
+    if (!this.isEmailVerified) {
+      alert('You need to verify your email before becoming an organizer.');
+      return;
+    }
+    
     this.profileService.requestOrganizerRole(this.userId).subscribe({
       next: (response) => {
         if (response.success) {
@@ -195,57 +214,25 @@ export class UserProfileComponent implements OnInit {
   }
 
   sendVerificationEmail(): void {
+    this.isEmailSending = true;
+    this.emailVerificationMessage = '';
+
+    console.log('Sending verification email to:', this.userEmail);
+    
     this.profileService.sendVerificationEmail(this.userEmail).subscribe({
       next: (response) => {
+        console.log('Email verification response:', response);
+        this.isEmailSending = false;
         if (response.success) {
-          this.showEmailVerificationModal = true;
+          this.emailVerificationMessage = 'Verification email sent! Please check your inbox and click the verification link.';
         } else {
-          alert('Failed to send verification email: ' + response.message);
+          this.emailVerificationMessage = 'Failed to send verification email: ' + response.message;
         }
       },
       error: (err) => {
         console.error('Error sending verification email:', err);
-        alert('Failed to send verification email. Please try again.');
-      }
-    });
-  }
-
-  verifyEmail(code: string): void {
-    this.formErrors.verificationCode = !code || code.length !== 6;
-    
-    if (this.formErrors.verificationCode) {
-      return;
-    }
-    
-    this.profileService.verifyEmail(this.userEmail, code).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.isEmailVerified = true;
-          this.showEmailVerificationModal = false;
-          alert('Email verified successfully!');
-        } else {
-          alert('Failed to verify email: ' + response.message);
-        }
-      },
-      error: (err) => {
-        console.error('Error verifying email:', err);
-        alert('Failed to verify email. Please check the code and try again.');
-      }
-    });
-  }
-
-  resendVerificationCode(): void {
-    this.profileService.sendVerificationEmail(this.userEmail).subscribe({
-      next: (response) => {
-        if (response.success) {
-          alert('A new verification code has been sent to your email.');
-        } else {
-          alert('Failed to send verification code: ' + response.message);
-        }
-      },
-      error: (err) => {
-        console.error('Error sending verification code:', err);
-        alert('Failed to send verification code. Please try again.');
+        this.isEmailSending = false;
+        this.emailVerificationMessage = 'Failed to send verification email. Please try again.';
       }
     });
   }
@@ -416,11 +403,6 @@ export class UserProfileComponent implements OnInit {
         alert('Failed to update bid. Please try again.');
       }
     });
-  }
-
-  closeEmailVerificationModal(): void {
-    this.showEmailVerificationModal = false;
-    this.verificationCode = '';
   }
 
   closeUpdateBidModal(): void {
