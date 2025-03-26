@@ -98,12 +98,16 @@ export class NavBarComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.isLoggedIn = false;
-    this.userName = 'User';
-    this.userEmail = '';
-    this.isMemorySession = false;
-    this.closeMenu();
+    const confirmLogout = confirm('Are you sure you want to log out?');
+    
+    if (confirmLogout) {
+      this.authService.logout();
+      this.isLoggedIn = false;
+      this.userName = 'User';
+      this.userEmail = '';
+      this.isMemorySession = false;
+      this.closeMenu();
+    }
   }
 
   openRegister(): void {

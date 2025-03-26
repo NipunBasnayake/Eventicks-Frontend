@@ -49,9 +49,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(email, password).subscribe({
       next: (response) => {
         this.authService.storeUserData(response.data || response, rememberMe);
-        
-        alert('Login successful!');
-        
+        this.isVisible = false;
         this.closeModal();
       },
       error: (err) => {
@@ -99,7 +97,6 @@ export class LoginComponent implements OnInit {
     this.forgotPassword.emit(email);
   }
   
-  // Google Sign-in method commented out as requested
   signInWithGoogle(): void {
     /*
     this.isGoogleLoading = true;
