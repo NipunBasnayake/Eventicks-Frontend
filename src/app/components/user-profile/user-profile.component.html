@@ -1,0 +1,331 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-info">
+      <div class="profile-details">
+        <h2>{{ userFullName }}</h2>
+        <div class="user-metadata">
+          <span class="user-role-badge" [ngClass]="{'role-user': userRole === 'USER', 'role-organizer': userRole === 'ORGANIZER', 'role-admin': userRole === 'ADMIN'}">{{ userRole }}</span>
+          <span class="user-since">Member since: {{ registeredDate }}</span>
+          <span class="user-login">Last login: {{ lastLoginDate }}</span>
+        </div>
+        
+        <div class="email-verification" *ngIf="!isEmailVerified">
+          <p class="verification-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"></path>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+            Email not verified
+          </p>
+          <button class="verify-email-btn" (click)="sendVerificationEmail()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 2L11 13"></path>
+              <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+            </svg>
+            Send Verification Code
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-nav">
+    <button class="nav-btn" [class.active]="activeTab === 'tickets'" (click)="setActiveTab('tickets')">My Tickets</button>
+    <button class="nav-btn" [class.active]="activeTab === 'bids'" (click)="setActiveTab('bids')">My Bids</button>
+    <button class="nav-btn" [class.active]="activeTab === 'personal'" (click)="setActiveTab('personal')">Become an Event Organizer</button>
+    <button class="nav-btn" [class.active]="activeTab === 'security'" (click)="setActiveTab('security')">Security</button>
+  </div>
+
+  <div class="profile-content">
+    <div *ngIf="activeTab === 'personal'" class="personal-details tab-content">
+      <div class="organizer-request-section" *ngIf="userRole === 'USER'">
+        <h3>Become an Event Organizer</h3>
+        <p>Want to host and manage your own events? Submit a request to become an organizer.</p>
+        <div class="organizer-benefits">
+          <h4>Benefits of becoming an organizer:</h4>
+          <ul>
+            <li>Create and publish your own events</li>
+            <li>Manage ticket sales and attendee information</li>
+            <li>Access detailed analytics and reporting tools</li>
+            <li>Custom branding options for your event pages</li>
+            <li>Priority customer support</li>
+          </ul>
+        </div>
+        <div class="organizer-requirements">
+          <h4>Requirements:</h4>
+          <ul>
+            <li>Verified email address</li>
+            <li>Complete profile information</li>
+            <li>Valid payment information</li>
+          </ul>
+        </div>
+        <button class="request-organizer-btn" (click)="requestOrganizerRole()">
+          <span>Submit Request</span>
+        </button>
+      </div>
+      
+      <div class="account-info-section" *ngIf="userRole === 'ORGANIZER'">
+        <h3>Organizer Account</h3>
+        <p>You are currently registered as an event organizer. You can create and manage events from the organizer dashboard.</p>
+        <button class="organizer-dashboard-btn" (click)="goToOrganizerDashboard()">
+          <span>Go to Organizer Dashboard</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'tickets'" class="tickets-tab tab-content">
+      <h3>My Tickets</h3>
+      <div class="tickets-filter">
+        <button class="filter-btn" [class.active]="ticketsFilter === 'all'" (click)="filterTickets('all')">All</button>
+        <button class="filter-btn" [class.active]="ticketsFilter === 'upcoming'" (click)="filterTickets('upcoming')">Upcoming</button>
+        <button class="filter-btn" [class.active]="ticketsFilter === 'past'" (click)="filterTickets('past')">Past</button>
+      </div>
+      
+      <div *ngIf="tickets.length === 0" class="no-tickets-message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="12" rx="2" ry="2"></rect>
+          <line x1="2" y1="7" x2="5" y2="7"></line>
+          <line x1="2" y1="11" x2="5" y2="11"></line>
+          <line x1="19" y1="7" x2="22" y2="7"></line>
+          <line x1="19" y1="11" x2="22" y2="11"></line>
+          <rect x="8" y="16" width="8" height="4" rx="1" ry="1"></rect>
+        </svg>
+        <p>You haven't purchased any tickets yet</p>
+        <button class="browse-events-btn" (click)="browseEvents()">Browse Events</button>
+      </div>
+      
+      <div *ngIf="tickets.length > 0" class="tickets-grid">
+        <div class="ticket-card" *ngFor="let ticket of tickets">
+          <div class="ticket-header">
+            <h4>{{ ticket.eventName }}</h4>
+            <span class="ticket-status" [ngClass]="ticket.status.toLowerCase()">{{ ticket.status }}</span>
+          </div>
+          <div class="ticket-details">
+            <p class="ticket-date">{{ ticket.eventDate }}</p>
+            <p class="ticket-venue">{{ ticket.venue }}</p>
+            <p class="ticket-type">{{ ticket.ticketType }}</p>
+          </div>
+          <div class="ticket-actions">
+            <button class="ticket-btn view-btn">View Details</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="activeTab === 'bids'" class="bids-tab tab-content">
+      <h3>My Bids</h3>
+      <div class="bids-filter">
+        <button class="filter-btn" [class.active]="bidsFilter === 'all'" (click)="filterBids('all')">All</button>
+        <button class="filter-btn" [class.active]="bidsFilter === 'active'" (click)="filterBids('active')">Active</button>
+        <button class="filter-btn" [class.active]="bidsFilter === 'won'" (click)="filterBids('won')">Won</button>
+        <button class="filter-btn" [class.active]="bidsFilter === 'lost'" (click)="filterBids('lost')">Lost</button>
+      </div>
+      
+      <div *ngIf="bids.length === 0" class="no-bids-message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+          <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+        </svg>
+        <p>You haven't placed any bids yet</p>
+        <button class="browse-auctions-btn" (click)="browseAuctions()">Browse Auctions</button>
+      </div>
+      
+      <div *ngIf="bids.length > 0" class="bids-table-container">
+        <table class="bids-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Ticket Type</th>
+              <th>Your Bid</th>
+              <th>Highest Bid</th>
+              <th>Status</th>
+              <th>Ends In</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bid of bids">
+              <td>{{ bid.event }}</td>
+              <td>{{ bid.ticketType }}</td>
+              <td>{{ bid.amount }} LKR</td>
+              <td>{{ bid.highestBid }} LKR</td>
+              <td>
+                <span class="bid-status" [ngClass]="bid.status.toLowerCase()">{{ bid.status }}</span>
+              </td>
+              <td>{{ bid.timeRemaining }}</td>
+              <td>
+                <button *ngIf="bid.status === 'ACTIVE'" class="update-bid-btn small" (click)="openUpdateBidModal(bid)">Update</button>
+                <span *ngIf="bid.status !== 'ACTIVE'">-</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div *ngIf="activeTab === 'security'" class="security-tab tab-content">
+      <h3>Security Settings</h3>
+      
+      <div class="security-section">
+        <h4>Change Password</h4>
+        <form (ngSubmit)="updatePassword(currentPassword, newPassword, confirmPassword)">
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" id="currentPassword" name="currentPassword" [(ngModel)]="currentPassword" placeholder="Enter your current password" required>
+            <div class="error-message" [style.display]="formErrors.currentPassword ? 'block' : 'none'">Current password is required</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" name="newPassword" [(ngModel)]="newPassword" (input)="checkPasswordStrength(newPassword)" placeholder="Enter your new password" required minlength="8">
+            <div class="password-strength">
+              <div class="strength-bar"></div>
+              <div class="strength-bar"></div>
+              <div class="strength-bar"></div>
+              <div class="strength-bar"></div>
+            </div>
+            <div class="strength-text">Password strength: {{ passwordStrength }}</div>
+            <div class="error-message" [style.display]="formErrors.newPassword ? 'block' : 'none'">New password must be at least 8 characters</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Confirm your new password" required>
+            <div class="error-message" [style.display]="formErrors.confirmPassword ? 'block' : 'none'">Passwords do not match</div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="change-password-btn">Update Password</button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="security-section">
+        <h4>Two-Factor Authentication</h4>
+        <div class="two-factor-toggle">
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="twoFactorEnabled" (change)="toggleTwoFactor()">
+            <span class="slider round"></span>
+          </label>
+          <span>{{ twoFactorEnabled ? 'Enabled' : 'Disabled' }}</span>
+        </div>
+        <p class="security-description">Two-factor authentication adds an extra layer of security to your account by requiring a verification code in addition to your password when you log in.</p>
+      </div>
+      
+      <div class="security-section">
+        <h4>Login Activity</h4>
+        <table class="login-activity-table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Device</th>
+              <th>IP Address</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let activity of loginActivity">
+              <td>{{ activity.date }}</td>
+              <td>{{ activity.device }}</td>
+              <td>{{ activity.ip }}</td>
+              <td>{{ activity.location }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="popup-overlay" [class.show]="showEmailVerificationModal">
+    <div class="popup-container">
+      <div class="popup-header">
+        <h2>Verify Your Email</h2>
+        <button type="button" class="close-btn" (click)="closeEmailVerificationModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="popup-body">
+        <div class="verification-message">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <p>We've sent a verification code to <strong>{{ userEmail }}</strong>. Please enter the code below to verify your email address.</p>
+        </div>
+        
+        <form (ngSubmit)="verifyEmail(verificationCode)">
+          <div class="form-group verification-code-group">
+            <label for="verificationCode">Verification Code</label>
+            <input type="text" id="verificationCode" name="verificationCode" [(ngModel)]="verificationCode" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required>
+            <div class="error-message" [style.display]="formErrors.verificationCode ? 'block' : 'none'">Please enter a valid 6-digit code</div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="verify-btn">Verify Email</button>
+          </div>
+        </form>
+        
+        <div class="resend-code">
+          <p>Didn't receive the code? <button class="resend-btn" (click)="resendVerificationCode()">
+            <span>Resend Code</span>
+          </button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="popup-overlay" [class.show]="showUpdateBidModal">
+    <div class="popup-container">
+      <div class="popup-header">
+        <h2>Update Your Bid</h2>
+        <button type="button" class="close-btn" (click)="closeUpdateBidModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="popup-body" *ngIf="selectedBid">
+        <div class="bid-details">
+          <h3>{{ selectedBid.event }}</h3>
+          <p class="ticket-type">{{ selectedBid.ticketType }} Ticket</p>
+          
+          <div class="bid-info">
+            <div class="current-bid">
+              <p>Your Current Bid</p>
+              <h4>{{ selectedBid.amount }} LKR</h4>
+            </div>
+            <div class="highest-bid">
+              <p>Highest Bid</p>
+              <h4>{{ selectedBid.highestBid }} LKR</h4>
+            </div>
+          </div>
+          
+          <form (ngSubmit)="updateBid(newBidAmount)">
+            <div class="form-group">
+              <label for="newBidAmount">New Bid Amount (LKR)</label>
+              <input type="number" id="newBidAmount" name="newBidAmount" [(ngModel)]="newBidAmount" [min]="selectedBid.highestBid + 100" step="100" required>
+              <div class="error-message" [style.display]="formErrors.newBidAmount ? 'block' : 'none'">Your bid must be higher than the current highest bid</div>
+            </div>
+            
+            <div class="min-bid-note">
+              <p>Minimum bid increment: 100 LKR</p>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="update-bid-btn">Update Bid</button>
+            </div>
+          </form>
+          
+          <div class="auction-ends">
+            <p>Auction ends in: <strong>{{ selectedBid.timeRemaining }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

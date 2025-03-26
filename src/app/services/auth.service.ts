@@ -54,7 +54,12 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/auth/login`, body, {
       headers: headers,
       responseType: 'json'
-    });
+    }).pipe(
+      tap(response => {
+        // Store user data upon successful login
+        this.storeUserData(response, !this.inMemoryOnly);
+      })
+    );
   }
 
   signInWithGoogle(): Promise<any> {
@@ -91,6 +96,11 @@ export class AuthService {
   getToken(): string | null {
     const user = this.getCurrentUser();
     return user && user.token ? user.token : null;
+  }
+
+  getUserEmail(): string | null {
+    const user = this.getCurrentUser();
+    return user && user.email ? user.email : null;
   }
 
   storeUserData(userData: any, rememberMe: boolean): void {
@@ -146,6 +156,18 @@ export class AuthService {
       body
     ).pipe(
       map(response => response.data)
+    );
+  }
+
+  getUserProfile(email: string): Observable<any> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Accept', '*/*');
+    
+    return this.http.get(`${this.apiUrl}/api/users/email/${email}`, {
+      headers: headers
+    }).pipe(
+      map(response => response)
     );
   }
 }

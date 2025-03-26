@@ -37,23 +37,28 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(): void {
     this.submitted = true;
-
+  
     if (this.registerForm.invalid) {
       return;
     }
-
+  
     const { fullName, email, password } = this.registerForm.value;
-
+  
     this.authService.register(fullName, email, password).subscribe({
       next: (response) => {
-        alert('Registration successful! You are now logged in.');
         this.closeModal();
+        this.loadLoginForm();
       },
       error: (err) => {
         console.error('Registration error:', err);
         alert('Registration failed. Please try again.');
       }
     });
+  }
+
+  loadLoginForm(): void {
+    this.isVisible = false;
+    this.login.emit();
   }
 
   openModal(): void {
