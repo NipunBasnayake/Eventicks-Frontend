@@ -1,0 +1,91 @@
+<div class="popup-overlay" id="eventPopup">
+    <div class="popup-container">
+      <div class="popup-header">
+        <h2 id="popupTitle">Event Details</h2>
+        <button class="close-btn" onclick="togglePopup()">
+          <i>✕</i>
+        </button>
+      </div>
+      <div class="popup-body">
+        <form id="eventForm">
+          <input type="hidden" id="eventId" name="eventId">
+          
+          <div class="form-group">
+            <label for="name">Event Name*</label>
+            <input type="text" id="name" name="name" placeholder="Enter event name" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Enter event description"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventDate">Event Date & Time*</label>
+              <input type="datetime-local" id="eventDate" name="eventDate" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="totalTickets">Total Tickets*</label>
+              <input type="number" id="totalTickets" name="totalTickets" placeholder="Enter total tickets" min="1" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="venueName">Venue Name*</label>
+              <input type="text" id="venueName" name="venueName" placeholder="Enter venue name" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="venueLocation">Venue Location*</label>
+              <input type="text" id="venueLocation" name="venueLocation" placeholder="Enter venue location" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="category">Category*</label>
+            <select id="category" name="category" required>
+              <option value="">Select category</option>
+              <option value="Conference">Conference</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Concert">Concert</option>
+              <option value="Sports">Sports</option>
+              <option value="Exhibition">Exhibition</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="createdById">Created By ID</label>
+              <input type="text" id="createdById" name="createdById" class="read-only-field" readonly>
+            </div>
+            
+            <div class="form-group">
+              <label for="createdByUsername">Created By</label>
+              <input type="text" id="createdByUsername" name="createdByUsername" class="read-only-field" readonly>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="createdAt">Created At</label>
+              <input type="datetime-local" id="createdAt" name="createdAt" class="read-only-field" readonly>
+            </div>
+            
+            <div class="form-group">
+              <label for="availableTickets">Available Tickets</label>
+              <input type="number" id="availableTickets" name="availableTickets" class="read-only-field" readonly>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="save-btn" id="saveBtn">Save Event</button>
+            <button type="button" class="cancel-btn" onclick="togglePopup()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
