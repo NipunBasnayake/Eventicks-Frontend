@@ -1,74 +1,74 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-email-verification',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule],
   templateUrl: './email-verification.component.html',
-  styleUrls: ['./email-verification.component.css']
+  styleUrl: './email-verification.component.css'
 })
-export class EmailVerificationComponent implements OnInit, OnDestroy {
-  @Input() email: string = '';
-  @Output() verificationComplete = new EventEmitter<boolean>();
-  @Output() closeModal = new EventEmitter<void>();
+export class EmailVerificationComponent implements OnInit {
+  verificationStatus: 'verifying' | 'success' | 'error' = 'verifying';
+  errorMessage: string = '';
+  private apiUrl = 'http://localhost:8080';
 
-  verificationForm!: FormGroup;
-  resendCooldown: number = 0;
-  private cooldownInterval: any;
-
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private http: HttpClient
+  ) { }
 
   ngOnInit(): void {
-    this.verificationForm = this.fb.group({
-      verificationCode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]]
+    console.log('EmailVerificationComponent initialized');
+    this.route.queryParams.subscribe(params => {
+      const token = params['token'];
+      console.log('Token from URL:', token ? 'Token present' : 'No token');
+      
+      if (token) {
+        this.verifyEmail(token);
+      } else {
+        this.verificationStatus = 'error';
+        this.errorMessage = 'Invalid verification link. No token provided.';
+      }
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.cooldownInterval) {
-      clearInterval(this.cooldownInterval);
-    }
-  }
-
-  verifyEmail(): void {
-    if (this.verificationForm.valid) {
-      const code = this.verificationForm.get('verificationCode')?.value;
-      
-      // TODO: Send verification request to backend
-      console.log('Verifying email with code:', code);
-      
-      // For demo, we'll simulate a successful verification
-      setTimeout(() => {
-        this.verificationComplete.emit(true);
-      }, 1000);
-    }
-  }
-
-  resendVerificationCode(): void {
-    if (this.resendCooldown === 0) {
-      // TODO: Send request to resend verification code
-      console.log('Resending verification code to:', this.email);
-      
-      // Start cooldown
-      this.resendCooldown = 60;
-      this.cooldownInterval = setInterval(() => {
-        this.resendCooldown--;
-        if (this.resendCooldown === 0) {
-          clearInterval(this.cooldownInterval);
+  verifyEmail(token: string): void {
+    console.log('Verifying email with token...');
+    
+    this.http.get(`${this.apiUrl}/auth/verify-email`, {
+      params: { token }
+    }).subscribe({
+      next: (response: any) => {
+        console.log('Verification response:', response);
+        
+        if (response.success) {
+          this.verificationStatus = 'success';
+        } else {
+          this.verificationStatus = 'error';
+          this.errorMessage = response.message || 'Verification failed';
         }
-      }, 1000);
-    }
+      },
+      error: (err) => {
+        console.error('Verification error:', err);
+        this.verificationStatus = 'error';
+        this.errorMessage = err.error?.message || 'Verification failed. Please try again.';
+      }
+    });
   }
 
-  onClose(): void {
-    this.closeModal.emit();
+  goToProfile(): void {
+    this.router.navigate(['/profile']);
   }
 
-  closeOverlayOnOutsideClick(event: MouseEvent): void {
-    if ((event.target as HTMLElement).classList.contains('popup-overlay')) {
-      this.closeModal.emit();
-    }
+  goToHome(): void {
+    this.router.navigate(['/']);
+  }
+
+  requestNewVerification(): void {
+    this.router.navigate(['/request-verification']);
   }
 }

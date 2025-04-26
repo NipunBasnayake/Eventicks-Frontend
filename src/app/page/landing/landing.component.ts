@@ -1,157 +1,141 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { NavBarComponent } from "../../components/nav-bar/nav-bar.component";
-import { Event } from '../../models/Event';
 import { FooterComponent } from "../../components/footer/footer.component";
+import { EventPopupComponent } from '../../components/event-popup/event-popup.component';
+import { EventModel } from '../../models/EventModel';
+import { EventService } from '../../services/event.service';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, NavBarComponent, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule, NavBarComponent, FooterComponent, EventPopupComponent],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css'
+  styleUrls: ['./landing.component.css']
 })
 export class LandingComponent implements OnInit {
-
   searchQuery: string = '';
-  events: Event[] = [];
+  events: EventModel[] = [];
+  filteredEvents: EventModel[] = [];
+  selectedEvent: EventModel | null = null;
+  showEventPopup: boolean = false;
+  activeFilter: string | null = null;
 
-  constructor(private router: Router) { }
+  categories = [
+    { value: 'LIVE_CONCERTS', label: 'Live Concerts' },
+    { value: 'DJ_NIGHTS', label: 'DJ Nights' },
+    { value: 'CLASSICAL_MUSIC', label: 'Classical Music' },
+    { value: 'OPEN_MIC', label: 'Open Mic' },
+    { value: 'TRIBUTE_SHOWS', label: 'Tribute Shows' },
+    { value: 'MUSIC_FESTIVALS', label: 'Music Festivals' }
+  ];
+
+  constructor(private router: Router, private eventService: EventService) { }
 
   ngOnInit(): void {
     this.loadEvents();
   }
 
+  loadEvents(): void {
+    this.eventService.getFilteredEvents().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.events = response.data.map((event: any) => {
+            return new EventModel(
+              event.name,
+              event.description,
+              event.eventDate,
+              event.imageUrl,
+              event.venueName,
+              event.venueLocation,
+              event.category,
+              event.createdById,
+              event.totalTickets,
+              event.createdAt,
+              event.availableTickets,
+              event.eventId,
+              event.ticketPrice
+            );
+          });
+          this.filteredEvents = [...this.events];
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching events:', err);
+      }
+    });
+  }
+
+  filterEvents(category: string | null): void {
+    this.activeFilter = category;
+    this.applyFilters();
+  }
+
   handleSearchChange(event: any): void {
-    this.searchQuery = event.target.value;
+    this.searchQuery = event.target.value.toLowerCase();
+    this.applyFilters();
   }
 
   handleSearchSubmit(event: Event): void {
-    console.log('Searching for:', this.searchQuery);
-    this.router.navigate(['/search'], { queryParams: { query: this.searchQuery } });
+    event.preventDefault(); // Prevent form submission
+    this.applyFilters();
   }
 
-  viewEventDetails(eventId: number): void {
-    this.router.navigate(['/events', eventId]);
+  applyFilters(): void {
+    let filtered = [...this.events];
+
+    if (this.activeFilter) {
+      filtered = filtered.filter(event => event.category === this.activeFilter);
+    }
+
+    if (this.searchQuery) {
+      filtered = filtered.filter(event => 
+        event.name.toLowerCase().includes(this.searchQuery) ||
+        event.description.toLowerCase().includes(this.searchQuery) ||
+        event.venueName.toLowerCase().includes(this.searchQuery) ||
+        event.venueLocation.toLowerCase().includes(this.searchQuery))
+    }
+
+    this.filteredEvents = filtered;
+  }
+
+  viewEventDetails(event: EventModel): void {
+    this.selectedEvent = event;
+    this.showEventPopup = true;
+  }
+
+  closeEventPopup(): void {
+    this.showEventPopup = false;
+  }
+
+  handlePurchase(purchaseData: {eventId: number, ticketCount: number}): void {
+    console.log('Purchase initiated:', purchaseData);
+    this.closeEventPopup();
   }
 
   seeAllEvents(): void {
     this.router.navigate(['/events']);
   }
 
-  loadEvents(): void {
-    this.events = [
-      {
-        id: 1,
-        image: "https://assets.mytickets.lk/images/events/Oye%20Ojaye%20/IMG-20250308-WA0008-1741410420712.jpg",
-        date: "05 April 2025",
-        time: "07.00 PM",
-        location: "Nelum Pokuna, Colombo",
-        type: "Indoor Musical Concert",
-        title: "BNS Live",
-        price: "5000 LKR",
-        ticketsAvailable: 100,
-      },
-      {
-        id: 2,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "20 April 2025",
-        time: "06.30 PM",
-        location: "Sugathadasa, Colombo",
-        type: "Pop & Fusion Music Show",
-        title: "Wayo",
-        price: "3500 LKR",
-        ticketsAvailable: 120,
-      },
-      {
-        id: 3,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "10 May 2025",
-        time: "07.30 PM",
-        location: "Shangri-La, Colombo",
-        type: "Classical Music Performance",
-        title: "Marians",
-        price: "6000 LKR",
-        ticketsAvailable: 80,
-      },
-      {
-        id: 4,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "25 May 2025",
-        time: "08.00 PM",
-        location: "Earl's Regency, Kandy",
-        type: "Acoustic & Folk Music Show",
-        title: "Nanda Malini",
-        price: "4500 LKR",
-        ticketsAvailable: 90,
-      },
-      {
-        id: 5,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "07 June 2025",
-        time: "06.00 PM",
-        location: "BMICH, Colombo",
-        type: "Rock & Band Performance",
-        title: "Chithral",
-        price: "5000 LKR",
-        ticketsAvailable: 110,
-      },
-      {
-        id: 6,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "22 June 2025",
-        time: "07.00 PM",
-        location: "Nelum Pokuna, Colombo",
-        type: "Orchestra & Symphony Night",
-        title: "Symphony SL",
-        price: "7000 LKR",
-        ticketsAvailable: 75,
-      },
-      {
-        id: 7,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "15 July 2025",
-        time: "06.30 PM",
-        location: "Taj Samudra, Colombo",
-        type: "Jazz & Soul Music",
-        title: "Soul Sounds",
-        price: "5500 LKR",
-        ticketsAvailable: 85,
-      },
-      {
-        id: 8,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "30 July 2025",
-        time: "07.30 PM",
-        location: "Nelum Pokuna, Colombo",
-        type: "Modern Pop & Electronic Fusion",
-        title: "Infinity X",
-        price: "4000 LKR",
-        ticketsAvailable: 150,
-      },
-      {
-        id: 9,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "12 August 2025",
-        time: "08.00 PM",
-        location: "MR Theatre, Hambantota",
-        type: "Sinhala Retro Night",
-        title: "Flashback",
-        price: "3800 LKR",
-        ticketsAvailable: 95,
-      },
-      {
-        id: 10,
-        image: "https://assets.mytickets.lk/images/events/Bambarakanda%20Waterfall%20Abseiling/WhatsApp%20Image%202025-02-09%20at%2013.19.38-1739445005605.jpeg",
-        date: "20 August 2025",
-        time: "06.00 PM",
-        location: "Water's Edge, B'mulla",
-        type: "Outdoor Classical Fusion",
-        title: "Sanda Madala",
-        price: "5500 LKR",
-        ticketsAvailable: 70,
-      }
-    ];
+  getMonthShortName(dateString: string): string {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthIndex = new Date(dateString).getMonth();
+    return monthNames[monthIndex];
+  }
+
+  formatEventTime(dateString: string): string {
+    const eventDate = new Date(dateString);
+    let hours = eventDate.getHours();
+    let minutes = eventDate.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+  
+    const minutesFormatted = minutes < 10 ? '0' + minutes : minutes.toString();
+    return `${hours}:${minutesFormatted} ${ampm}`;
   }
 }

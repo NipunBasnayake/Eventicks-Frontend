@@ -1,41 +1,39 @@
-<div class="popup-overlay show" (click)="closeOverlayOnOutsideClick($event)">
-    <div class="popup-container">
-      <div class="popup-header">
-        <h2>Verify Your Email</h2>
-        <button type="button" class="close-btn" (click)="onClose()">
-          <img width="20" height="20" src="https://img.icons8.com/fluency/48/delete-sign.png" alt="delete-sign"/>
-        </button>
+<div class="verification-container">
+  <div class="verification-card">
+    <div class="logo">
+      <img src="assets/images/logo.png" alt="Eventicks Logo">
+    </div>
+    
+    <div class="verification-content">
+      <div *ngIf="verificationStatus === 'verifying'" class="verification-loading">
+        <div class="spinner"></div>
+        <h2>Verifying your email...</h2>
+        <p>Please wait while we confirm your email address.</p>
       </div>
-      <div class="popup-body">
-        <div class="verification-message">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          <p>We've sent a verification code to <strong>{{email}}</strong>. Please enter the code below to verify your email address.</p>
-        </div>
-        
-        <form [formGroup]="verificationForm" (ngSubmit)="verifyEmail()">
-          <div class="form-group verification-code-group">
-            <label for="verificationCode">Verification Code</label>
-            <input type="text" id="verificationCode" formControlName="verificationCode" placeholder="Enter 6-digit code" maxlength="6">
-            <div class="error-message" *ngIf="verificationForm.get('verificationCode')?.errors && verificationForm.get('verificationCode')?.touched">
-              <span *ngIf="verificationForm.get('verificationCode')?.errors?.['required']">Verification code is required</span>
-              <span *ngIf="verificationForm.get('verificationCode')?.errors?.['pattern']">Code must be 6 digits</span>
-            </div>
-          </div>
-          
-          <div class="form-actions">
-            <button type="submit" class="verify-btn" [disabled]="verificationForm.invalid">Verify Email</button>
-          </div>
-        </form>
-        
-        <div class="resend-code">
-          <p>Didn't receive the code? <button class="resend-btn" (click)="resendVerificationCode()" [disabled]="resendCooldown > 0">
-            <span *ngIf="resendCooldown === 0">Resend Code</span>
-            <span *ngIf="resendCooldown > 0">Resend in {{resendCooldown}}s</span>
-          </button></p>
+      
+      <div *ngIf="verificationStatus === 'success'" class="verification-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <h2>Email Verified!</h2>
+        <p>Your email address has been successfully verified.</p>
+        <button class="continue-btn" (click)="goToProfile()">Continue to Profile</button>
+      </div>
+      
+      <div *ngIf="verificationStatus === 'error'" class="verification-error">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#F44336" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <h2>Verification Failed</h2>
+        <p>{{ errorMessage || 'We could not verify your email address. The verification link may be expired or invalid.' }}</p>
+        <div class="error-actions">
+          <button class="retry-btn" (click)="requestNewVerification()">Request New Verification</button>
+          <button class="home-btn" (click)="goToHome()">Go to Homepage</button>
         </div>
       </div>
     </div>
   </div>
+</div>
