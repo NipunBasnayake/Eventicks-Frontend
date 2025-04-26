@@ -3,15 +3,19 @@
         <app-nav-bar></app-nav-bar>
     </section>
 </div>
-<br><br><br><br>
+
+<br /><br /><br /><br />
+
 <div class="search-hero-section">
     <div class="v5_102">
         <div class="v4_14"></div>
         <div class="hero-content">
             <h1 class="v5_55">Let's Book Your Event</h1>
-            <p class="v5_56">Book live events and discover concerts, events, theater and more.</p>
+            <p class="v5_56">
+                Book live events and discover concerts, events, theater and more.
+            </p>
 
-            <form class="v5_74">
+            <form class="v5_74" (submit)="handleSearchSubmit($event)">
                 <div class="v5_73">
                     <input type="text" class="v5_57 search-input" placeholder="Search for Events, Artists, Venues"
                         [value]="searchQuery" (input)="handleSearchChange($event)" aria-label="Search" />
@@ -29,22 +33,20 @@
 </div>
 
 <div class="latest-events">
-    <h1>Latest Events</h1>
-    <br />
     <div class="event-list">
         <div class="event-card" *ngFor="let event of events">
             <div class="event-image-wrapper">
-                <img [src]="event.image" [alt]="event.title" class="event-image" />
+                <img [src]="event.imageUrl" [alt]="event.name" class="event-image" />
                 <div class="event-overlay"></div>
                 <div class="event-date-badge">
-                    <span class="event-day">{{event.date.split(' ')[0]}}</span>
-                    <span class="event-month">{{event.date.split(' ')[1].substring(0, 3)}}</span>
+                    <span class="event-day">{{ event.eventDate.split("T")[0].split("-")[2] }}</span>
+                    <span class="event-month">{{ getMonthShortName(event.eventDate) }}</span>
                 </div>
-                <div class="event-type-badge">{{event.type}}</div>
+                <div class="event-type-badge">{{ event.category }}</div>
             </div>
 
             <div class="event-content">
-                <h3 class="event-title">{{event.title}}</h3>
+                <h3 class="event-title">{{ event.name }}</h3>
 
                 <ul class="event-details">
                     <li class="event-detail">
@@ -53,16 +55,18 @@
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        <span>{{event.time}}</span>
+                        <span>{{ formatEventTime(event.eventDate) }}</span>
                     </li>
+
                     <li class="event-detail">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                             <circle cx="12" cy="10" r="3"></circle>
                         </svg>
-                        <span>{{event.location}}</span>
+                        <span>{{ event.venueLocation }}</span>
                     </li>
+
                     <li class="event-detail">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -70,21 +74,40 @@
                             <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
                             <path d="M18 12a2 2 0 0 0 0 4h4v-4z"></path>
                         </svg>
-                        <span>{{event.price}}</span>
+                        <span>{{ event.totalTickets }} Tickets</span>
+                    </li>
+
+                    <li class="event-detail">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                            <path d="M18 12a2 2 0 0 0 0 4h4v-4z"></path>
+                        </svg>
+                        <span>LKR {{ event.ticketPrice }}</span>
                     </li>
                 </ul>
 
                 <div class="event-footer">
-                    <button class="book-now-button">Book Now</button>
+                    <button class="book-now-button" (click)="viewEventDetails(event)">
+                        Book Now
+                    </button>
                     <div class="tickets-info">
-                        <span class="tickets-count">{{event.ticketsAvailable}}</span>
+                        <span class="tickets-count">{{ event.availableTickets }}</span>
                         <span class="tickets-label">Tickets Left</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <span class="see-all-events" (click)="seeAllEvents()">See All Events</span>
 </div>
+
+<app-event-popup
+  *ngIf="selectedEvent"
+  [event]="selectedEvent"
+  [isVisible]="showEventPopup"
+  (close)="closeEventPopup()"
+  (purchase)="handlePurchase($event)">
+</app-event-popup>
 
 <app-footer></app-footer>

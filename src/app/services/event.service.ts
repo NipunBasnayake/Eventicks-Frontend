@@ -9,31 +9,11 @@ interface ApiResponse<T> {
   data: T;
 }
 
-interface EventDto {
-  eventId?: number;
-  name: string;
-  description: string;
-  eventDate: string;
-  venueName: string;
-  venueLocation: string;
-  category: string;
-  totalTickets: number;
-  ticketTypes: TicketType[];
-}
-
-interface TicketType {
-  name: string;
-  price: number;
-  quantity: number;
-  maxPerUser?: number;
-  description?: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
-  private apiUrl = 'http://localhost:8080/api/events'; // Update with your API URL
+  private apiUrl = 'http://localhost:8080/api/events'; 
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -44,16 +24,16 @@ export class EventService {
     });
   }
 
-  createEvent(eventData: FormData): Observable<ApiResponse<EventDto>> {
-    return this.http.post<ApiResponse<EventDto>>(
-      this.apiUrl, 
-      eventData, 
+  createEvent(event: Event): Observable<ApiResponse<Event>> {
+    return this.http.post<ApiResponse<Event>>(
+      this.apiUrl,
+      event,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  getEventById(eventId: number): Observable<ApiResponse<EventDto>> {
-    return this.http.get<ApiResponse<EventDto>>(
+  getEventById(eventId: number): Observable<ApiResponse<Event>> {
+    return this.http.get<ApiResponse<Event>>(
       `${this.apiUrl}/${eventId}`,
       { headers: this.getAuthHeaders() }
     );
@@ -63,13 +43,13 @@ export class EventService {
     category?: string,
     venueLocation?: string,
     searchTerm?: string
-  ): Observable<ApiResponse<EventDto[]>> {
+  ): Observable<ApiResponse<Event[]>> {
     let params: any = {};
     if (category) params.category = category;
     if (venueLocation) params.venueLocation = venueLocation;
     if (searchTerm) params.searchTerm = searchTerm;
-
-    return this.http.get<ApiResponse<EventDto[]>>(
+  
+    return this.http.get<ApiResponse<Event[]>>(
       this.apiUrl,
       { 
         headers: this.getAuthHeaders(),
@@ -77,18 +57,19 @@ export class EventService {
       }
     );
   }
+  
 
-  getUpcomingEvents(): Observable<ApiResponse<EventDto[]>> {
-    return this.http.get<ApiResponse<EventDto[]>>(
+  getUpcomingEvents(): Observable<ApiResponse<Event[]>> {
+    return this.http.get<ApiResponse<Event[]>>(
       `${this.apiUrl}/upcoming`,
       { headers: this.getAuthHeaders() }
     );
   }
 
-  updateEvent(eventId: number, eventData: EventDto): Observable<ApiResponse<EventDto>> {
-    return this.http.put<ApiResponse<EventDto>>(
+  updateEvent(eventId: number, event: Event): Observable<ApiResponse<Event>> {
+    return this.http.put<ApiResponse<Event>>(
       `${this.apiUrl}/${eventId}`,
-      eventData,
+      event,
       { headers: this.getAuthHeaders() }
     );
   }
@@ -100,8 +81,8 @@ export class EventService {
     );
   }
 
-  getEventsByCreator(userId: number): Observable<ApiResponse<EventDto[]>> {
-    return this.http.get<ApiResponse<EventDto[]>>(
+  getEventsByCreator(userId: number): Observable<ApiResponse<Event[]>> {
+    return this.http.get<ApiResponse<Event[]>>(
       `${this.apiUrl}/creator/${userId}`,
       { headers: this.getAuthHeaders() }
     );
