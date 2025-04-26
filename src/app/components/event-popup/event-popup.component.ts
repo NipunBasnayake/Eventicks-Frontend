@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { EventModel } from '../models/EventModel';
+import { EventModel } from '../../models/EventModel';
 
 @Component({
   selector: 'app-event-popup',

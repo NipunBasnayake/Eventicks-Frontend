@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NavBarComponent } from "../../components/nav-bar/nav-bar.component";
 import { FooterComponent } from "../../components/footer/footer.component";
-import { EventPopupComponent } from '../../event-popup/event-popup.component';
+import { EventPopupComponent } from '../../components/event-popup/event-popup.component';
 import { EventModel } from '../../models/EventModel';
 import { EventService } from '../../services/event.service';
 
@@ -16,42 +16,26 @@ import { EventService } from '../../services/event.service';
   styleUrls: ['./landing.component.css']
 })
 export class LandingComponent implements OnInit {
-
   searchQuery: string = '';
   events: EventModel[] = [];
+  filteredEvents: EventModel[] = [];
   selectedEvent: EventModel | null = null;
   showEventPopup: boolean = false;
+  activeFilter: string | null = null;
+
+  categories = [
+    { value: 'LIVE_CONCERTS', label: 'Live Concerts' },
+    { value: 'DJ_NIGHTS', label: 'DJ Nights' },
+    { value: 'CLASSICAL_MUSIC', label: 'Classical Music' },
+    { value: 'OPEN_MIC', label: 'Open Mic' },
+    { value: 'TRIBUTE_SHOWS', label: 'Tribute Shows' },
+    { value: 'MUSIC_FESTIVALS', label: 'Music Festivals' }
+  ];
 
   constructor(private router: Router, private eventService: EventService) { }
 
   ngOnInit(): void {
     this.loadEvents();
-  }
-
-  handleSearchChange(event: any): void {
-    this.searchQuery = event.target.value;
-  }
-
-  handleSearchSubmit(event: Event): void {
-    this.router.navigate(['/search'], { queryParams: { query: this.searchQuery } });
-  }
-
-  viewEventDetails(event: EventModel): void {
-    this.selectedEvent = event;
-    this.showEventPopup = true;
-  }
-
-  closeEventPopup(): void {
-    this.showEventPopup = false;
-  }
-
-  handlePurchase(purchaseData: {eventId: number, ticketCount: number}): void {
-    console.log('Purchase initiated:', purchaseData);
-    this.closeEventPopup();
-  }
-
-  seeAllEvents(): void {
-    this.router.navigate(['/events']);
   }
 
   loadEvents(): void {
@@ -75,14 +59,64 @@ export class LandingComponent implements OnInit {
               event.ticketPrice
             );
           });
-        } else {
-          console.error('Failed to load events:', response.message);
+          this.filteredEvents = [...this.events];
         }
       },
       error: (err) => {
         console.error('Error fetching events:', err);
       }
     });
+  }
+
+  filterEvents(category: string | null): void {
+    this.activeFilter = category;
+    this.applyFilters();
+  }
+
+  handleSearchChange(event: any): void {
+    this.searchQuery = event.target.value.toLowerCase();
+    this.applyFilters();
+  }
+
+  handleSearchSubmit(event: Event): void {
+    event.preventDefault(); // Prevent form submission
+    this.applyFilters();
+  }
+
+  applyFilters(): void {
+    let filtered = [...this.events];
+
+    if (this.activeFilter) {
+      filtered = filtered.filter(event => event.category === this.activeFilter);
+    }
+
+    if (this.searchQuery) {
+      filtered = filtered.filter(event => 
+        event.name.toLowerCase().includes(this.searchQuery) ||
+        event.description.toLowerCase().includes(this.searchQuery) ||
+        event.venueName.toLowerCase().includes(this.searchQuery) ||
+        event.venueLocation.toLowerCase().includes(this.searchQuery))
+    }
+
+    this.filteredEvents = filtered;
+  }
+
+  viewEventDetails(event: EventModel): void {
+    this.selectedEvent = event;
+    this.showEventPopup = true;
+  }
+
+  closeEventPopup(): void {
+    this.showEventPopup = false;
+  }
+
+  handlePurchase(purchaseData: {eventId: number, ticketCount: number}): void {
+    console.log('Purchase initiated:', purchaseData);
+    this.closeEventPopup();
+  }
+
+  seeAllEvents(): void {
+    this.router.navigate(['/events']);
   }
 
   getMonthShortName(dateString: string): string {

@@ -33,8 +33,21 @@
 </div>
 
 <div class="latest-events">
+    <div class="category-filters">
+        <button class="filter-button" [class.active]="!activeFilter" (click)="filterEvents(null)">
+            All Events
+        </button>
+        <button *ngFor="let category of categories" class="filter-button"
+            [class.active]="activeFilter === category.value" (click)="filterEvents(category.value)">
+            {{ category.label }}
+        </button>
+    </div>
+
     <div class="event-list">
-        <div class="event-card" *ngFor="let event of events">
+        <div *ngIf="filteredEvents.length === 0" class="no-results">
+            No events found matching your search criteria
+        </div>
+        <div class="event-card" *ngFor="let event of filteredEvents">
             <div class="event-image-wrapper">
                 <img [src]="event.imageUrl" [alt]="event.name" class="event-image" />
                 <div class="event-overlay"></div>
@@ -102,12 +115,8 @@
     </div>
 </div>
 
-<app-event-popup
-  *ngIf="selectedEvent"
-  [event]="selectedEvent"
-  [isVisible]="showEventPopup"
-  (close)="closeEventPopup()"
-  (purchase)="handlePurchase($event)">
+<app-event-popup *ngIf="selectedEvent" [event]="selectedEvent" [isVisible]="showEventPopup" (close)="closeEventPopup()"
+    (purchase)="handlePurchase($event)">
 </app-event-popup>
 
 <app-footer></app-footer>
