@@ -6,7 +6,7 @@ import { EmailVerificationComponent } from './components/email-verification/emai
 
 export const routes: Routes = [
     { path: "", component: LandingComponent },
-    { path: "landing", component: LandingComponent },
+    { path: "home", component: LandingComponent },
     { path: "profile", component: ProfileComponent },
     { path: 'verify-email', component: EmailVerificationComponent },
 ];
