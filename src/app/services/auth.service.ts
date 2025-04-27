@@ -56,7 +56,6 @@ export class AuthService {
       responseType: 'json'
     }).pipe(
       tap(response => {
-        // Store user data upon successful login
         this.storeUserData(response, !this.inMemoryOnly);
       })
     );

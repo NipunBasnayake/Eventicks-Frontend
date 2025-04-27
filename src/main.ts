@@ -6,7 +6,6 @@ import { provideHttpClient } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
-import { environment } from './environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -17,14 +16,7 @@ bootstrapApplication(AppComponent, {
       provide: 'SocialAuthServiceConfig',
       useValue: {
         autoLogin: false,
-        providers: [
-          {
-            id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider(
-              environment.googleClientId
-            )
-          }
-        ],
+        providers: [],
         onError: (err) => {
           console.error(err);
         }
